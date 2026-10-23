@@ -27,7 +27,7 @@ export default function Landing() {
     <Screen className="flex flex-col justify-center gap-8">
       <div className="flex justify-end"><ThemeToggle /></div>
       <div className="rounded-3xl bg-primary p-8 text-on-primary">
-        <p className="text-sm font-semibold uppercase tracking-widest">Steady SAT</p>
+        <p className="text-sm font-semibold uppercase tracking-widest">Crimsprint</p>
         <h1 className="mt-3 text-4xl font-bold leading-tight">Ten minutes a day to a higher SAT score.</h1>
         <p className="mt-4 text-lg">Short adaptive lessons, instant explanations, and a full mock test that mirrors the digital SAT.</p>
       </div>

@@ -1,4 +1,4 @@
-# Steady SAT
+# Crimsprint
 
 Duolingo-style SAT practice: onboarding, adaptive diagnostic, skill path, 8-item lessons with explanations, mistake budget, streaks, spaced review, daily quests, weekly leagues, achievements, a full two-module adaptive mock test with a score estimate, a progress dashboard, and an admin content tool. It uses no third-party branding, and its 592 items are original (20+ per skill across all 29 official skills).
 

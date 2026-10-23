@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Steady SAT",
+  title: "Crimsprint",
   description: "Bite-sized, adaptive SAT practice.",
 };
 
