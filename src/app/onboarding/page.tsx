@@ -2,12 +2,11 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
+import { DAILY_GOALS as GOALS } from '@/lib/goals'
 import { ensureUser, rpc } from '@/lib/supabase'
 
 const STEPS = ['goal', 'date', 'scores', 'daily', 'diagnostic'] as const
 type Step = (typeof STEPS)[number]
-// Minutes shown, points stored (docs/mechanics-to-sat.md §2).
-const GOALS = [{ min: 5, pts: 10, label: 'Casual' }, { min: 10, pts: 20, label: 'Regular' }, { min: 15, pts: 30, label: 'Serious' }, { min: 20, pts: 40, label: 'Intense' }]
 const SCORES = Array.from({ length: 121 }, (_, i) => 400 + i * 10)
 
 function Options<T extends string | number>({ name, value, onChange, options }: {

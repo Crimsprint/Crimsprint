@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
 import { supabase } from '@/lib/supabase'
@@ -19,8 +18,7 @@ export default function Account() {
   }
 
   return (
-    <Screen className="space-y-5">
-      <Link href="/learn" className="underline">← Back to your path</Link>
+    <Screen wide className="space-y-5">
       <h1 className="text-2xl font-bold">Save your progress</h1>
       <p className="text-text-muted">You’re practicing as a guest. Add your email so you can sign in on another device without losing your streak or mastery.</p>
       {state === 'sent' ? (

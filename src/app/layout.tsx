@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Crimsprint",
   description: "Bite-sized, adaptive SAT practice.",
 };
+
+// "cover" lets the phone tab bar pad itself with env(safe-area-inset-bottom).
+export const viewport: Viewport = { viewportFit: "cover" };
 
 // Applies a saved light/dark choice before first paint (see ThemeToggle).
 const themeScript = `try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}`;

@@ -52,8 +52,8 @@ export const Flame = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} aria-hidden fill="currentColor"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 01-10 0c0-2.5 1.2-4 2.5-5 0 2 1 3 2 3 0-3-1.5-5.5.5-9z" /></svg>
 )
 
-export function Screen({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <main className={`mx-auto w-full max-w-xl flex-1 px-4 py-6 ${className}`}>{children}</main>
+export function Screen({ children, className = '', wide = false }: { children: ReactNode; className?: string; wide?: boolean }) {
+  return <main className={`mx-auto w-full ${wide ? 'max-w-[45rem]' : 'max-w-xl'} flex-1 px-4 py-6 ${className}`}>{children}</main>
 }
 
 /** Error/incorrect banner: crimson only as a filled strip and icon disc (never thin lines), always with an icon and a label. */

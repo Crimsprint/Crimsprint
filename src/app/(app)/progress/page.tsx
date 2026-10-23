@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Screen } from '@/components/ui'
 import { Bars, pct } from '@/components/Bars'
@@ -27,8 +26,8 @@ export default function ProgressPage() {
       .then(([p, h]) => setData({ p, h })).catch((e) => setError(e.message))
   }, [])
 
-  if (error) return <Screen><Alert title="Couldn’t load progress">{error}</Alert></Screen>
-  if (!data) return <Screen><p aria-live="polite">Loading…</p></Screen>
+  if (error) return <Screen wide><Alert title="Couldn’t load progress">{error}</Alert></Screen>
+  if (!data) return <Screen wide><p aria-live="polite">Loading…</p></Screen>
   const { p, h } = data
   const latest = p.mocks?.at(-1)?.total
   const domains = [...new Set(h.skills.map((s) => s.domain))].map((d) => {
@@ -38,8 +37,7 @@ export default function ProgressPage() {
   const earned = new Set(p.achievements?.map((a) => a.code))
 
   return (
-    <Screen className="space-y-8">
-      <Link href="/learn" className="underline">← Back</Link>
+    <Screen wide className="space-y-8">
       <h1 className="text-2xl font-bold">Your progress</h1>
 
       <section className="grid grid-cols-2 gap-3">

@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
 import { ensureUser, rpc } from '@/lib/supabase'
@@ -24,12 +23,11 @@ export default function Leagues() {
     setVersion((v) => v + 1)
   }
 
-  if (error) return <Screen><Alert title="Couldn’t load leagues">{error}</Alert></Screen>
-  if (!league) return <Screen><p aria-live="polite">Loading…</p></Screen>
+  if (error) return <Screen wide><Alert title="Couldn’t load leagues">{error}</Alert></Screen>
+  if (!league) return <Screen wide><p aria-live="polite">Loading…</p></Screen>
 
   if (league.opted_out) return (
-    <Screen className="space-y-4">
-      <Link href="/learn" className="underline">← Back</Link>
+    <Screen wide className="space-y-4">
       <h1 className="text-2xl font-bold">Leagues are off</h1>
       <p className="text-text-muted">You won’t appear on weekly leaderboards.</p>
       <Button onClick={() => optOut(false)}>Join leagues</Button>
@@ -38,8 +36,7 @@ export default function Leagues() {
 
   const n = league.members.length
   return (
-    <Screen className="space-y-4">
-      <Link href="/learn" className="underline">← Back</Link>
+    <Screen wide className="space-y-4">
       <h1 className="text-2xl font-bold">{league.tier_name} League</h1>
       <p className="text-text-muted">
         Ranked by points this week. Ends {new Date(league.week_end + 'T00:00:00Z').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' })}.

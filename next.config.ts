@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  redirects: async () => [{ source: "/leagues", destination: "/leaderboards", permanent: true }],
   turbopack: {
     rules: {
       "*.css": {

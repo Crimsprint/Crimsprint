@@ -25,8 +25,7 @@ export default function MockHome() {
   }
 
   return (
-    <Screen className="space-y-5">
-      <Link href="/learn" className="underline">← Back</Link>
+    <Screen wide className="space-y-5">
       <h1 className="text-2xl font-bold">Full-length mock test</h1>
       <ul className="space-y-1 text-text-muted">
         <li>• Reading and Writing: 2 modules, 27 questions and 32 minutes each</li>

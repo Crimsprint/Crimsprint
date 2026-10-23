@@ -26,6 +26,7 @@ const pairs: [string, string, number][] = [
   ['on-primary', 'primary', 4.5], ['on-success', 'success', 4.5], ['on-danger', 'danger', 4.5], ['on-accent', 'accent', 4.5],
   ['on-locked', 'locked-bg', 4.5], ['locked', 'locked-bg', 1.9], // locked icon is decorative; state is also in the label
   ['focus', 'bg', 3], ['focus', 'surface', 3],
+  ['text', 'sidebar', 4.5], ['text', 'nav-active', 4.5], ['nav-active-border', 'sidebar', 3], ['nav-active-border', 'nav-active', 3],
 ]
 
 describe('theme tokens', () => {
