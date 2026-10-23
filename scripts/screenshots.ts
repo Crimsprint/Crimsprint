@@ -1,6 +1,6 @@
 // Review screenshots of the running app (npm run dev) in headless Chrome, at desktop and phone sizes in light and dark.
-// Run: node scripts/screenshots.ts <outDir> <path[|css selector to click first]>...
-//   e.g. node scripts/screenshots.ts screenshots/section-1 /learn "/learn|button[aria-controls=more-menu]" /progress
+// Run: node scripts/screenshots.ts <outDir> <path[|css selector to click first[|name suffix]]>...
+//   e.g. node scripts/screenshots.ts screenshots/section-1 /learn "/learn|button[aria-controls=more-menu]|more" /progress
 // One guest learner persists in <outDir>/../.profile and is onboarded (diagnostic skipped) on first run.
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -72,7 +72,7 @@ try {
   }
 
   for (const spec of specs) {
-    const [path, clickSelector] = spec.split('|')
+    const [path, clickSelector, suffix = 'open'] = spec.split('|')
     for (const size of sizes) {
       const [width, height] = SIZES[size]
       await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile: size === 'mobile' })
@@ -87,12 +87,13 @@ try {
           await sleep(300)
         }
         const { data } = await cdp('Page.captureScreenshot', { format: 'png' }) as { data: string }
-        const name = `${path.replace(/^\//, '').replace(/\//g, '-') || 'home'}${clickSelector ? '-open' : ''}-${size}-${scheme}.png`
+        const name = `${path.replace(/^\//, '').replace(/\//g, '-') || 'home'}${clickSelector ? `-${suffix}` : ''}-${size}-${scheme}.png`
         writeFileSync(join(outDir, name), Buffer.from(data, 'base64'))
         console.log(name)
       }
     }
   }
+  await evaluate(`localStorage.removeItem('track')`) // per-viewer track choice: start the next run on the default
 } finally {
   ws.close()
   chrome.kill()

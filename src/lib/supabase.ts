@@ -34,13 +34,14 @@ export async function rpc<T>(fn: string, args?: Record<string, unknown>): Promis
 }
 
 export type Home = {
-  profile: { onboarded: boolean; daily_goal: number; target_score: number | null; test_date: string | null; freezes: number; streak: number; done_today: boolean }
+  profile: { onboarded: boolean; daily_goal: number; target_score: number | null; test_date: string | null; freezes: number; coins: number; streak: number; done_today: boolean }
   today_points: number
   due_reviews: number
   diagnosed: boolean
   skills: {
     id: string; name: string; section: 'rw' | 'math'; domain_id: string; domain: string; share: number
-    mastery: number; passed: Tier[]; counts: Partial<Record<Tier, number>>
+    mastery: number; answered: number; passed: Tier[]; counts: Partial<Record<Tier, number>>
   }[]
+  units: Record<string, { practice_done: boolean; chest_claimed: boolean; test_passed: boolean }>
 }
 export type Tier = 'easy' | 'medium' | 'hard'

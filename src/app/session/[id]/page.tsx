@@ -174,6 +174,8 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
   const pct = (x: number) => `${Math.round(x * 100)}%`
   const title = s.mode === 'diagnostic' ? 'Diagnostic complete'
     : s.status === 'failed' ? 'Out of mistakes for this lesson'
+    : s.mode === 'unit_test' ? (s.passed ? 'Unit test passed!' : 'Not quite: 8 of 10 passes the unit test')
+    : s.mode === 'unit_practice' ? 'Practice complete'
     : s.passed ? 'Level complete!' : 'Lesson complete'
   return (
     <Screen className="space-y-6">
