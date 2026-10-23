@@ -1,6 +1,6 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useState, type ReactNode } from 'react'
+import { Suspense, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
 import { ensureUser, rpc } from '@/lib/supabase'
@@ -9,16 +9,19 @@ const STEPS = ['goal', 'date', 'scores', 'daily', 'diagnostic'] as const
 type Step = (typeof STEPS)[number]
 const SCORES = Array.from({ length: 121 }, (_, i) => 400 + i * 10)
 
-function Options<T extends string | number>({ name, value, onChange, options }: {
-  name: string; value: T | null; onChange: (v: T) => void; options: { value: T; label: ReactNode }[]
+function Options<T extends string | number>({ name, legend, value, onChange, options }: {
+  name: string; legend: string; value: T | null; onChange: (v: T) => void; options: { value: T; label: ReactNode }[]
 }) {
+  const uid = useId()
   return (
     <fieldset className="space-y-3">
-      <legend className="sr-only">{name}</legend>
+      <legend className="sr-only">{legend}</legend>
       {options.map((o) => (
         <label key={o.value} className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-border bg-surface px-4 has-[:checked]:border-text has-[:checked]:bg-surface-muted">
-          <input type="radio" name={name} className="size-5 accent-[var(--color-text)]" checked={value === o.value} onChange={() => onChange(o.value)} />
-          {o.label}
+          {/* Explicit name and value: some screen readers announced these as "on". */}
+          <input type="radio" name={name} value={String(o.value)} aria-labelledby={`${uid}-${o.value}`} className="size-5 accent-[var(--color-text)]"
+            checked={value === o.value} onChange={() => onChange(o.value)} />
+          <span id={`${uid}-${o.value}`} className="flex flex-1">{o.label}</span>
         </label>
       ))}
     </fieldset>
@@ -78,7 +81,7 @@ function Onboarding() {
 
       {step === 'goal' && <>
         <h1 className="text-2xl font-bold">Is this your first SAT?</h1>
-        <Options name="goal" value={goal} onChange={setGoal} options={[{ value: 'first', label: 'Yes, it’s my first time' }, { value: 'retake', label: 'No, I’m retaking it' }]} />
+        <Options name="goal" legend="Is this your first SAT?" value={goal} onChange={setGoal} options={[{ value: 'first', label: 'Yes, it’s my first time' }, { value: 'retake', label: 'No, I’m retaking it' }]} />
       </>}
 
       {step === 'date' && <>
@@ -89,7 +92,8 @@ function Onboarding() {
             className="min-h-12 w-full rounded-xl border-2 border-border bg-surface px-4" />
         </label>
         <label className="flex items-center gap-3">
-          <input type="checkbox" className="size-5" checked={noDate} onChange={(e) => setNoDate(e.target.checked)} /> I haven’t booked a date yet
+          <input type="checkbox" value="no-date" aria-labelledby="no-date" className="size-5" checked={noDate} onChange={(e) => setNoDate(e.target.checked)} />
+          <span id="no-date">I haven’t booked a date yet</span>
         </label>
       </>}
 
@@ -109,8 +113,8 @@ function Onboarding() {
 
       {step === 'daily' && <>
         <h1 className="text-2xl font-bold">Pick a daily goal</h1>
-        <Options name="daily" value={daily} onChange={setDaily} options={GOALS.map((g) => ({
-          value: g.pts, label: <span className="flex w-full justify-between"><b>{g.min} min / day</b><span className="text-text-muted">{g.label}</span></span>,
+        <Options name="daily" legend="Daily goal" value={daily} onChange={setDaily} options={GOALS.map((g) => ({
+          value: g.pts, label: <span className="flex w-full justify-between"><b>{g.min} min / day</b>{' '}<span className="text-text-muted">{g.label}</span></span>,
         }))} />
       </>}
 

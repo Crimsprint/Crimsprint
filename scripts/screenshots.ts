@@ -1,6 +1,8 @@
 // Review screenshots of the running app (npm run dev) in headless Chrome, at desktop and phone sizes in light and dark.
 // Run: node scripts/screenshots.ts <outDir> <path[|css selector to click first[|name suffix]]>...
 //   e.g. node scripts/screenshots.ts screenshots/section-1 /learn "/learn|button[aria-controls=more-menu]|more" /progress
+// The spec @lesson starts the current path lesson, always picks choice A, and captures the question, the first correct and
+// first incorrect feedback sheets, and the completion screen (each at every size and scheme).
 // One guest learner persists in <outDir>/../.profile and is onboarded (diagnostic skipped) on first run.
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -72,7 +74,48 @@ try {
     await until(`location.pathname === '/learn'`, '/learn')
   }
 
+  // Re-renders the current page at every size and scheme without navigating (the session's state must survive).
+  async function captureAll(name: string) {
+    for (const size of sizes) {
+      const [width, height] = SIZES[size]
+      await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile: size === 'mobile' })
+      for (const scheme of ['light', 'dark']) {
+        await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] })
+        await sleep(700)
+        await evaluate(`document.querySelector('nextjs-portal')?.remove()`)
+        const { data } = await cdp('Page.captureScreenshot', { format: 'png' }) as { data: string }
+        writeFileSync(join(outDir, `${name}-${size}-${scheme}.png`), Buffer.from(data, 'base64'))
+        console.log(`${name}-${size}-${scheme}.png`)
+      }
+    }
+  }
+  const button = (text: string) => evaluate(`[...document.querySelectorAll('button')].find((b) => b.textContent.trim() === ${JSON.stringify(text)} && !b.disabled)?.click()`)
+
   for (const spec of specs) {
+    if (spec === '@lesson') {
+      await go('/learn')
+      await evaluate(`document.querySelector('[data-current]').click()`)
+      await sleep(300)
+      await button('Start')
+      await until(`location.pathname.startsWith('/session/') && !!document.querySelector('input[type=radio]')`, 'the lesson')
+      await captureAll('lesson-question')
+      const seen = new Set<string>()
+      for (let i = 0; i < 20; i++) {
+        await evaluate(`document.querySelector('input[type=radio]').click()`)
+        await button('Check')
+        // textContent, not innerText: buttons are CSS-uppercased.
+        await until(`[...document.querySelectorAll('button')].some((b) => b.textContent.trim() === 'Continue')`, 'feedback')
+        const kind = await evaluate<string>(`document.body.textContent.includes('Incorrect') ? 'incorrect' : 'correct'`)
+        if (!seen.has(kind)) { seen.add(kind); await captureAll(`lesson-${kind}`) }
+        await button('Continue')
+        await until(`!!document.querySelector('input[type=radio]') || !document.querySelector('[role=progressbar][aria-label^="Question"]')`, 'next step')
+        await sleep(500)
+        if (!(await evaluate<boolean>(`!!document.querySelector('input[type=radio]')`))) break
+      }
+      await until(`!!document.querySelector('h1')`, 'completion')
+      await captureAll('lesson-complete')
+      continue
+    }
     const [path, clickSelector, suffix = 'open'] = spec.split('|')
     for (const size of sizes) {
       const [width, height] = SIZES[size]

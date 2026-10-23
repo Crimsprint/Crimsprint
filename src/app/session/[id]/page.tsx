@@ -1,7 +1,8 @@
 'use client'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useId, useRef, useState } from 'react'
 import { Alert, Button, Check, ProgressBar, Screen, XIcon } from '@/components/ui'
 import { Tex } from '@/components/Tex'
 import { MathTools } from '@/components/MathTools'
@@ -60,6 +61,11 @@ function SessionPlayer() {
   const [skew, setSkew] = useState(0)
   const [expired, setExpired] = useState(false)
   const continueRef = useRef<HTMLButtonElement>(null)
+  const sheet = useRef<HTMLDivElement>(null)
+  const answers = useRef<HTMLDivElement>(null)
+  const question = useRef<HTMLParagraphElement>(null)
+  const [sheetH, setSheetH] = useState(0)
+  const uid = useId()
 
   // Bumped to fetch the next item.
   const [step, setStep] = useState(0)
@@ -84,6 +90,23 @@ function SessionPlayer() {
     return () => { live = false }
   }, [id, step])
   useEffect(() => { if (fb) continueRef.current?.focus() }, [fb])
+  // Each new question takes focus, so keyboard and screen-reader users start from it rather than a removed button.
+  useEffect(() => { if (cur) question.current?.focus() }, [cur])
+  // The bottom sheet grows with feedback; the page pads itself by the sheet's real height.
+  useEffect(() => {
+    const el = sheet.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setSheetH(el.offsetHeight))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [cur])
+  // When feedback opens, scroll so the answer choices sit above the sheet (top first if they can't all fit).
+  useEffect(() => {
+    const box = answers.current?.getBoundingClientRect()
+    if (!fb || !box) return
+    const over = Math.min(box.bottom - (innerHeight - sheetH) + 16, box.top - 16)
+    if (over > 0) scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  }, [fb, sheetH])
   // A drill whose clock ran out ends here, with whatever was answered in time.
   useEffect(() => {
     if (!expired) return
@@ -118,8 +141,7 @@ function SessionPlayer() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* Bottom padding matches the feedback sheet's max height so it never hides the question. */}
-      <Screen className={`flex flex-col gap-5 ${fb ? 'pb-[65dvh]' : 'pb-32'}`}>
+      <Screen className="flex flex-col gap-5">
         <div className="flex items-center gap-3">
           <Link href="/learn" aria-label="Quit session" className="grid size-10 shrink-0 place-items-center rounded-full"><XIcon className="size-5" /></Link>
           <ProgressBar value={cur.index + (fb ? 1 : 0)} max={cur.total} label={`Question ${cur.index + 1} of ${cur.total}`} />
@@ -129,42 +151,47 @@ function SessionPlayer() {
             return <span className="shrink-0 text-sm font-semibold" aria-label={`${left} mistakes left`}>{left} ✕ left</span>
           })()}
         </div>
-        <p className="text-sm text-text-muted">{cur.mode === 'diagnostic' ? `Diagnostic · ${cur.index + 1} of ${cur.total}` : item.skill} · <span className="capitalize">{item.tier}</span></p>
+        <p ref={question} tabIndex={-1} className="text-sm text-text-muted">{cur.mode === 'diagnostic' ? `Diagnostic · ${cur.index + 1} of ${cur.total}` : item.skill} · <span className="capitalize">{item.tier}</span></p>
 
         {item.passage && <Tex text={item.passage} className="rounded-xl border-2 border-border bg-surface p-4 leading-relaxed" />}
         <Tex text={item.stem} className="text-lg font-semibold leading-relaxed" />
         {item.section === 'math' && <MathTools />}
 
-        {item.kind === 'mcq' ? (
-          <fieldset disabled={!!fb} className="space-y-3">
-            <legend className="sr-only">Answer choices</legend>
-            {item.choices!.map((c, i) => {
-              const isKey = fb && c.id === fb.correct_answer
-              const isWrongPick = fb && !fb.correct && c.id === answer
-              return (
-                <label key={c.id} className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 has-[:checked]:border-text has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus ${
-                  isKey ? 'border-success bg-success text-on-success' : isWrongPick ? 'border-border bg-surface-muted' : 'border-border bg-surface'}`}>
-                  <input type="radio" name="choice" value={c.id} checked={answer === c.id} onChange={() => setAnswer(c.id)} className="sr-only" />
-                  <span className="grid size-8 shrink-0 place-items-center rounded-lg border-2 border-current font-semibold">{LETTERS[i]}</span>
-                  <Tex text={c.text} className="flex-1" />
-                  {isKey && <><Check className="size-5" /><span className="sr-only">Correct answer</span></>}
-                  {isWrongPick && <><XIcon className="size-5" /><span className="sr-only">Your answer</span></>}
-                </label>
-              )
-            })}
-          </fieldset>
-        ) : (
-          <label className="block">
-            <span className="mb-2 block text-sm text-text-muted">Enter your answer (up to 5 characters, 6 if negative; fractions like 2/3 or decimals like .6667)</span>
-            <input inputMode="decimal" autoComplete="off" maxLength={6} value={answer} disabled={!!fb}
-              onChange={(e) => SPR_CHARS.test(e.target.value) && setAnswer(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && submit()}
-              className="min-h-14 w-40 rounded-xl border-2 border-border bg-surface px-4 text-xl font-semibold" />
-          </label>
-        )}
+        <div ref={answers}>
+          {item.kind === 'mcq' ? (
+            <fieldset disabled={!!fb} className="space-y-3">
+              <legend className="sr-only">Answer choices</legend>
+              {item.choices!.map((c, i) => {
+                const isKey = fb && c.id === fb.correct_answer
+                const isWrongPick = fb && !fb.correct && c.id === answer
+                return (
+                  <label key={c.id} className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 has-[:checked]:border-text has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus ${
+                    isKey ? 'border-success bg-success text-on-success' : isWrongPick ? 'border-border bg-surface-muted' : 'border-border bg-surface'}`}>
+                    {/* Named by the letter shown on screen; the shuffled choice's id is only used for grading. */}
+                    <input type="radio" name="choice" value={LETTERS[i]} checked={answer === c.id} onChange={() => setAnswer(c.id)} className="sr-only"
+                      aria-labelledby={`${uid}-l${i} ${uid}-t${i}`} />
+                    <span id={`${uid}-l${i}`} className="grid size-8 shrink-0 place-items-center rounded-lg border-2 border-current font-semibold">{LETTERS[i]}</span>
+                    <Tex id={`${uid}-t${i}`} text={c.text} className="flex-1" />
+                    {isKey && <><Check className="size-5" /><span className="sr-only">Correct answer</span></>}
+                    {isWrongPick && <><XIcon className="size-5" /><span className="sr-only">Your answer</span></>}
+                  </label>
+                )
+              })}
+            </fieldset>
+          ) : (
+            <label className="block">
+              <span className="mb-2 block text-sm text-text-muted">Enter your answer (up to 5 characters, 6 if negative; fractions like 2/3 or decimals like .6667)</span>
+              <input inputMode="decimal" autoComplete="off" maxLength={6} value={answer} disabled={!!fb}
+                onChange={(e) => SPR_CHARS.test(e.target.value) && setAnswer(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && submit()}
+                className="min-h-14 w-40 rounded-xl border-2 border-border bg-surface px-4 text-xl font-semibold" />
+            </label>
+          )}
+        </div>
+        <div aria-hidden style={{ height: sheetH }} />
       </Screen>
 
-      <div className="fixed inset-x-0 bottom-0 border-t-2 border-border bg-surface">
+      <div ref={sheet} className="fixed inset-x-0 bottom-0 border-t-2 border-border bg-surface">
         <div className="mx-auto max-h-[65dvh] max-w-xl overflow-y-auto px-4 py-4" aria-live="polite">
           {fb ? (
             <div className={`-mx-4 -my-4 px-4 py-4 ${fb.correct ? 'bg-success text-on-success' : ''}`}>
@@ -214,9 +241,18 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
     : s.mode === 'drill' ? (s.total < s.planned ? 'Time’s up!' : 'Drill complete')
     : s.mode === 'mistakes' ? 'Mistakes reviewed'
     : s.passed ? 'Level complete!' : 'Lesson complete'
+  // The raccoon cheers on a pass or a finished practice; after a miss it stays still beside an encouraging line.
+  const cheer = s.status === 'completed' && (s.passed || !['lesson', 'unit_test'].includes(s.mode))
   return (
     <Screen className="space-y-6">
-      <h1 className="text-3xl font-bold">{title}</h1>
+      <div className="flex items-center gap-4">
+        <Image src="/mascot/raccoon.png" alt="Crimsprint raccoon mascot" width={88} height={88} priority
+          className={`shrink-0 ${cheer ? 'motion-safe:animate-cheer' : ''}`} />
+        <div>
+          <h1 className="text-3xl font-bold">{title}</h1>
+          {!cheer && <p className="text-text-muted">Every miss is a question you’ll get right next time.</p>}
+        </div>
+      </div>
       {s.mode === 'drill' && <p>You answered {s.total} of {s.planned} questions in time.</p>}
       {s.status === 'failed' && <p>No lockout: take a short break, then try the lesson again. Every miss is in your review queue.</p>}
       <dl className="grid grid-cols-2 gap-3">

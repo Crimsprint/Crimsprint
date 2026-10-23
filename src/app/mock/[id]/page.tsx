@@ -123,9 +123,10 @@ function Module({ id, st, onSubmitted }: { id: string; st: State; onSubmitted: (
                 <legend className="sr-only">Answer choices</legend>
                 {slot.item.choices!.map((c) => (
                   <label key={c.id} className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-border bg-surface px-4 py-3 has-[:checked]:border-text has-[:checked]:bg-surface-muted has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-focus">
-                    <input type="radio" name={`q${slot.position}`} className="sr-only" checked={slot.response === c.id} onChange={() => setResponse(slot.position, c.id)} />
-                    <span className="grid size-8 shrink-0 place-items-center rounded-lg border-2 border-current font-semibold">{c.id}</span>
-                    <Tex text={c.text} className="flex-1" />
+                    <input type="radio" name={`q${slot.position}`} value={c.id} className="sr-only" checked={slot.response === c.id} onChange={() => setResponse(slot.position, c.id)}
+                      aria-labelledby={`q${slot.position}-${c.id}-l q${slot.position}-${c.id}-t`} />
+                    <span id={`q${slot.position}-${c.id}-l`} className="grid size-8 shrink-0 place-items-center rounded-lg border-2 border-current font-semibold">{c.id}</span>
+                    <Tex id={`q${slot.position}-${c.id}-t`} text={c.text} className="flex-1" />
                   </label>
                 ))}
               </fieldset>

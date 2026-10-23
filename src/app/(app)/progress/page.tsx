@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Screen } from '@/components/ui'
 import { Bars, pct } from '@/components/Bars'
+import { domainRows, skillRow } from '@/lib/mastery'
 import { ensureUser, rpc, type Home } from '@/lib/supabase'
 
 type Progress = {
@@ -30,10 +31,6 @@ export default function ProgressPage() {
   if (!data) return <Screen wide><p aria-live="polite">Loading…</p></Screen>
   const { p, h } = data
   const latest = p.mocks?.at(-1)?.total
-  const domains = [...new Set(h.skills.map((s) => s.domain))].map((d) => {
-    const ss = h.skills.filter((s) => s.domain === d)
-    return { label: d, value: ss.reduce((a, s) => a + s.mastery, 0) / ss.length }
-  })
 
   return (
     <Screen wide className="space-y-8">
@@ -67,10 +64,10 @@ export default function ProgressPage() {
         })}
       </section>
 
-      <Bars title="Mastery by domain" rows={domains} />
+      <Bars title="Mastery by domain" rows={domainRows(h.skills, h.diagnosed)} />
 
       {(['rw', 'math'] as const).map((sec) => (
-        <Bars key={sec} title={`${NAMES[sec]} skills`} rows={h.skills.filter((s) => s.section === sec).map((s) => ({ label: s.name, value: s.mastery }))} />
+        <Bars key={sec} title={`${NAMES[sec]} skills`} rows={h.skills.filter((s) => s.section === sec).map((s) => skillRow(s, h.diagnosed))} />
       ))}
 
       {p.weeks && <Bars title="Weekly accuracy" rows={p.weeks.map((w) => ({ label: `Week of ${w.week} (${w.answered} Qs)`, value: w.accuracy }))} />}

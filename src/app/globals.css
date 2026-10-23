@@ -53,6 +53,7 @@
   --color-chart-4: var(--putty);
   --color-chart-5: var(--green);
   --animate-bob: bob 2.4s ease-in-out infinite;
+  --animate-cheer: cheer 0.9s ease-in-out 3;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -105,6 +106,12 @@
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+
+@keyframes cheer {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-14px) rotate(-6deg); }
+  75% { transform: translateY(-14px) rotate(6deg); }
 }
 
 body {

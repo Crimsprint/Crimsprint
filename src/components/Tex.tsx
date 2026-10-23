@@ -16,9 +16,9 @@ function Inline({ text }: { text: string }) {
 const cells = (line: string) => line.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim())
 
 /** Renders authored text: blank lines → paragraphs; a paragraph of `| a | b |` lines → a table (first row = header). */
-export function Tex({ text, className }: { text: string; className?: string }) {
+export function Tex({ text, className, id }: { text: string; className?: string; id?: string }) {
   return (
-    <div className={className}>
+    <div id={id} className={className}>
       {text.split(/\n\s*\n/).map((para, i) => {
         const lines = para.trim().split('\n')
         if (lines.every((l) => l.trim().startsWith('|'))) {
