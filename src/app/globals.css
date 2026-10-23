@@ -54,6 +54,10 @@
   --color-chart-5: var(--green);
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-cheer: cheer 0.9s ease-in-out 3;
+  --animate-nod: nod 1.2s ease-in-out 2;
+  --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-drift: drift 3s ease-in-out infinite;
+  --animate-pop: pop 1.6s ease-out 2 both;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -112,6 +116,28 @@
   0%, 100% { transform: translateY(0) rotate(0); }
   25% { transform: translateY(-14px) rotate(-6deg); }
   75% { transform: translateY(-14px) rotate(6deg); }
+}
+
+@keyframes nod {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-5deg) translateY(2px); }
+  60% { transform: rotate(3deg); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+/* Sleeping "z": rises and fades. */
+@keyframes drift {
+  0% { transform: translate(0, 0); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(18px, -40px); opacity: 0; }
+}
+/* Confetti: bursts out from the center and fades. */
+@keyframes pop {
+  0% { transform: scale(0.2); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: scale(1.15); opacity: 0; }
 }
 
 body {

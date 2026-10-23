@@ -1,11 +1,11 @@
 'use client'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { Suspense, useEffect, useId, useRef, useState } from 'react'
 import { Alert, Button, Check, ProgressBar, Screen, XIcon } from '@/components/ui'
 import { Tex } from '@/components/Tex'
 import { MathTools } from '@/components/MathTools'
+import { Mascot } from '@/components/Mascot'
 import { ReportItem } from '@/components/ReportItem'
 import { ACHIEVEMENTS } from '@/lib/achievements'
 import { rpc, supabase } from '@/lib/supabase'
@@ -201,6 +201,10 @@ function SessionPlayer() {
                   {fb.correct ? <Check className="size-5" /> : <XIcon className="size-5" />}
                 </span>
                 <p className="text-xl font-bold">{fb.correct ? 'Correct' : 'Incorrect'}</p>
+                {!fb.correct && <>
+                  <p className="text-sm">{fb.mistakes_left === 0 ? 'That was the last mistake. You can try again right away.' : 'Not quite. You’ll get the next one.'}</p>
+                  <Mascot pose="encouraging" size={48} className="ml-auto" />
+                </>}
               </div>
               {!fb.correct && <div className="mt-2"><span className="font-semibold">Correct answer:</span><Tex text={keyText ?? ''} /></div>}
               {!fb.correct && fb.rationale && <p className="mt-2"><span className="font-semibold">Why your choice is wrong: </span>{fb.rationale}</p>}
@@ -241,13 +245,12 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
     : s.mode === 'drill' ? (s.total < s.planned ? 'Time’s up!' : 'Drill complete')
     : s.mode === 'mistakes' ? 'Mistakes reviewed'
     : s.passed ? 'Level complete!' : 'Lesson complete'
-  // The raccoon cheers on a pass or a finished practice; after a miss it stays still beside an encouraging line.
-  const cheer = s.status === 'completed' && (s.passed || !['lesson', 'unit_test'].includes(s.mode))
+  // The raccoon celebrates a pass, a finished practice or a streak milestone, and encourages after a miss.
+  const cheer = (s.status === 'completed' && (s.passed || !['lesson', 'unit_test'].includes(s.mode))) || earned.some((c) => c.startsWith('streak_'))
   return (
     <Screen className="space-y-6">
       <div className="flex items-center gap-4">
-        <Image src="/mascot/raccoon.png" alt="Crimsprint raccoon mascot" width={88} height={88} priority
-          className={`shrink-0 ${cheer ? 'motion-safe:animate-cheer' : ''}`} />
+        <Mascot pose={cheer ? 'celebrating' : 'encouraging'} size={88} priority />
         <div>
           <h1 className="text-3xl font-bold">{title}</h1>
           {!cheer && <p className="text-text-muted">Every miss is a question you’ll get right next time.</p>}

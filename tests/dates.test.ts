@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { daysUntil, nextMidnight, timeLeft, utcDate } from '../src/lib/dates'
+import { daysUntil, nextMidnight, streakAtRisk, timeLeft, utcDate } from '../src/lib/dates'
 
 describe('daysUntil', () => {
   const today = new Date(2026, 9, 23, 23, 30) // late evening local time must not round up a day
@@ -25,5 +25,15 @@ describe('timeLeft', () => {
   it('finds the next local midnight and a UTC week end', () => {
     expect(nextMidnight(new Date(2026, 9, 23, 23, 59)).getDate()).toBe(24)
     expect(utcDate('2026-10-26').toISOString()).toBe('2026-10-26T00:00:00.000Z')
+  })
+})
+
+describe('streakAtRisk', () => {
+  const night = new Date(2026, 9, 23, 20, 5), evening = new Date(2026, 9, 23, 19, 59)
+  it('is true from 8pm local with a live streak and nothing done today', () => {
+    expect(streakAtRisk({ streak: 4, done_today: false }, night)).toBe(true)
+    expect(streakAtRisk({ streak: 4, done_today: false }, evening)).toBe(false)
+    expect(streakAtRisk({ streak: 4, done_today: true }, night)).toBe(false)
+    expect(streakAtRisk({ streak: 0, done_today: false }, night)).toBe(false)
   })
 })

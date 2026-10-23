@@ -1,7 +1,7 @@
 'use client'
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { NavIcon } from '@/components/AppShell'
+import { Mascot } from '@/components/Mascot'
 import { Button, Check, Lock, XIcon } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
 import { nodeOffset, type PathNode, type Unit } from '@/lib/path'
@@ -29,13 +29,6 @@ function subtitle(n: PathNode) {
   return '10 questions · 8 right finishes the unit'
 }
 const STATE_TEXT = { done: 'completed', current: 'start here', available: 'available to test out', locked: 'locked' }
-
-function Mascot({ side, bob }: { side: 'left' | 'right'; bob: boolean }) {
-  return (
-    <Image src="/mascot/raccoon.png" alt="Crimsprint raccoon mascot" width={96} height={96}
-      className={`pointer-events-none absolute top-1/2 -mt-12 max-w-none ${bob ? 'motion-safe:animate-bob' : ''} ${side === 'left' ? 'right-full mr-6' : 'left-full ml-6'}`} />
-  )
-}
 
 /** Progress ring drawn around the current node: how much of the unit is done. */
 function Ring({ value }: { value: number }) {
@@ -86,8 +79,8 @@ function Popover({ n, unit, busy, onStart, onClaim, close }: {
   )
 }
 
-function UnitBlock({ unit, section, openKey, setOpenKey, busy, onStart, onClaim, onTips, flip }: {
-  unit: Unit; section: 'rw' | 'math'; openKey: string | null; setOpenKey: (k: string | null) => void
+function UnitBlock({ unit, section, openKey, setOpenKey, busy, onStart, onClaim, onTips, flip, sleepy }: {
+  unit: Unit; section: 'rw' | 'math'; openKey: string | null; setOpenKey: (k: string | null) => void; sleepy: boolean
   busy: boolean; onStart: (args: StartArgs) => void; onClaim: (domain: string) => void; onTips: (u: Unit) => void; flip: boolean
 }) {
   const half = Math.floor(unit.nodes.length / 2)
@@ -128,7 +121,11 @@ function UnitBlock({ unit, section, openKey, setOpenKey, busy, onStart, onClaim,
                   }[n.state]}`}>
                   {n.state === 'done' ? <Check className="size-8" /> : n.state === 'locked' ? <Lock className="size-7" /> : <KindIcon kind={n.kind} className="size-8" />}
                 </button>
-                {(current || i === half) && <Mascot side={side} bob={current} />}
+                {(current || i === half) && (
+                  <span className={`pointer-events-none absolute top-1/2 -mt-12 ${side === 'left' ? 'right-full mr-6' : 'left-full ml-6'}`}>
+                    <Mascot pose={current && sleepy ? 'sleeping' : 'idle'} still={!current} />
+                  </span>
+                )}
               </div>
               {open && <Popover n={n} unit={unit} busy={busy} onStart={onStart} onClaim={onClaim}
                 close={() => { setOpenKey(null); document.getElementById(`node-${n.key}`)?.focus() }} />}
@@ -140,8 +137,9 @@ function UnitBlock({ unit, section, openKey, setOpenKey, busy, onStart, onClaim,
   )
 }
 
-export function Path({ units, section, busy, onStart, onClaim }: {
-  units: Unit[]; section: 'rw' | 'math'; busy: boolean; onStart: (args: StartArgs) => void; onClaim: (domain: string) => void
+/** `sleepy`: the streak is at risk tonight, so the raccoon at the current node dozes. */
+export function Path({ units, section, busy, onStart, onClaim, sleepy = false }: {
+  units: Unit[]; section: 'rw' | 'math'; busy: boolean; onStart: (args: StartArgs) => void; onClaim: (domain: string) => void; sleepy?: boolean
 }) {
   const [openKey, setOpenKey] = useState<string | null>(null)
   const [tips, setTips] = useState<Unit | null>(null)
@@ -155,7 +153,7 @@ export function Path({ units, section, busy, onStart, onClaim }: {
     }}>
       {units.map((u, i) => (
         <UnitBlock key={u.id} unit={u} section={section} openKey={openKey} setOpenKey={setOpenKey} busy={busy}
-          onStart={onStart} onClaim={onClaim} onTips={setTips} flip={i % 2 === 1} />
+          onStart={onStart} onClaim={onClaim} onTips={setTips} flip={i % 2 === 1} sleepy={sleepy} />
       ))}
       <dialog ref={dialog} onClose={() => setTips(null)} aria-labelledby="tips-title"
         className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-surface p-6 text-text backdrop:bg-scrim/60">

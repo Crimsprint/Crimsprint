@@ -30,7 +30,16 @@ npm run dev
 | `scripts/math-templates*.ts` | Original math item templates; each answer computed and checked by substitution |
 | `data/items/rw.json`, `data/items/rw/*.json` | Original Reading and Writing items (compact format: key first, rationales in order) |
 | `scripts/build-seed.ts` | Validates all items and writes `data/items/math.json` and `supabase/seed.sql` (`npm run seed`) |
+| `supabase/migrations/0006_*.sql`, `0007_*.sql` | Learning path (units, chests, unit tests, diagnostic placement); profile, shop, weekly quests, timed drills, review-every-mistake |
 | `src/app/globals.css` | The only place colors are defined (theme tokens, light/dark) |
+| `design/raccoon-source.png` → `scripts/mascot.ts` | Mascot cut-out, head badge, favicon and the six avatar colors (recolored from the token file) |
+| `scripts/trace.ts` | Traces the mascot into `public/mascot/raccoon.svg` (four flat colors) |
+| `scripts/screenshots.ts` | Review screenshots of the running app at desktop, tablet and phone sizes, light and dark (`@lesson` walks a lesson) |
 | `tests/` | `npm test`: runs the real migration in PGlite (in-process Postgres) and checks theme contrast |
 
 Answer keys never reach the browser. The `items` table has no RLS policy, so items are served only through security-definer RPCs that strip answers.
+
+## Mascot poses (TODO)
+
+`src/components/Mascot.tsx` has four poses (idle, celebrating, encouraging, sleeping). All of them are the one source illustration plus original overlays (closed eyes, "z"s, confetti) and CSS motion, which stops under reduced motion. Drawing true poses in the same style (arms up for celebrating, a thumbs-up for encouraging, curled up asleep) needs an illustrator.
+

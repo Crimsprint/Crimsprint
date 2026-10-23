@@ -16,3 +16,6 @@ export const nextMidnight = (now = new Date()) => new Date(now.getFullYear(), no
 
 /** 00:00 UTC on an ISO date: when a league week (and its weekly quests) ends. */
 export const utcDate = (isoDate: string) => new Date(`${isoDate}T00:00:00Z`)
+
+/** After 8pm local time with a streak going and nothing done today, the streak ends at midnight. */
+export const streakAtRisk = (p: { streak: number; done_today: boolean }, now = new Date()) => p.streak > 0 && !p.done_today && now.getHours() >= 20

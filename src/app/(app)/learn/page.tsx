@@ -1,11 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Mascot } from '@/components/Mascot'
 import { Path, type StartArgs } from '@/components/Path'
 import { QuestList, type Quest } from '@/components/Quests'
 import { CountdownCard, DiagnosticCard, LeagueCard, StatsBar, type LatestMock, type League, type OpenLesson } from '@/components/Rail'
 import { Alert, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
+import { streakAtRisk } from '@/lib/dates'
 import { buildTrack } from '@/lib/path'
 import { ensureUser, rpc, supabase, type Home } from '@/lib/supabase'
 
@@ -86,6 +88,8 @@ export default function Learn() {
   if (!home) return <Screen>{error ? <Alert title="Couldn’t load your path">{error}</Alert> : <p aria-live="polite">Loading your path…</p>}</Screen>
 
   const diagnostic = !home.diagnosed && <DiagnosticCard busy={busy} onStart={() => start({ p_mode: 'diagnostic' })} />
+  // The raccoon falls asleep while the streak is at risk, until a lesson is done.
+  const atRisk = streakAtRisk(home.profile)
   return (
     <div className="mx-auto flex w-full max-w-[66rem] flex-1 justify-center gap-12 px-4 py-6">
       <main className="w-full max-w-[600px] space-y-6">
@@ -104,10 +108,16 @@ export default function Learn() {
           ))}
         </div>
 
+        {atRisk && (
+          <section aria-label="Streak at risk" className="flex items-center gap-4 rounded-2xl border-2 border-border bg-surface p-4">
+            <Mascot pose="sleeping" size={72} />
+            <p><span className="font-semibold">Your {home.profile.streak}-day streak ends at midnight.</span> One lesson keeps it going.</p>
+          </section>
+        )}
         {error && <Alert title="Something went wrong">{error}</Alert>}
         <p role="status" className={notice ? 'rounded-xl bg-success p-3 font-semibold text-on-success' : 'sr-only'}>{notice}</p>
 
-        <Path units={units} section={track} busy={busy} onStart={start} onClaim={claim} />
+        <Path units={units} section={track} busy={busy} onStart={start} onClaim={claim} sleepy={atRisk} />
       </main>
       {/* Scrolls on its own when taller than the window, so every card stays reachable while it sticks. */}
       <aside aria-label="Your stats" className="sticky top-6 hidden max-h-[calc(100dvh-3rem)] w-[360px] shrink-0 space-y-4 self-start overflow-y-auto xl:block">
