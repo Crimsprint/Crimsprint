@@ -3,10 +3,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Path, type StartArgs } from '@/components/Path'
 import { DailyQuests, type Quest } from '@/components/Quests'
-import { Alert, Button, Flame, GoalRing, Screen } from '@/components/ui'
+import { CountdownCard, DiagnosticCard, LeagueCard, StatsBar, type LatestMock, type League, type OpenLesson } from '@/components/Rail'
+import { Alert, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
 import { buildTrack } from '@/lib/path'
-import { ensureUser, rpc, type Home } from '@/lib/supabase'
+import { ensureUser, rpc, supabase, type Home } from '@/lib/supabase'
 
 type Track = 'rw' | 'math'
 const TRACKS: { id: Track; name: string }[] = [{ id: 'rw', name: 'Reading and Writing' }, { id: 'math', name: 'Math' }]
@@ -18,6 +19,9 @@ export default function Learn() {
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const [quests, setQuests] = useState<Quest[]>([])
+  const [league, setLeague] = useState<League | null>(null)
+  const [mock, setMock] = useState<LatestMock>(null)
+  const [openLesson, setOpenLesson] = useState<OpenLesson>(null)
   const [version, setVersion] = useState(0)
   const [track, setTrack] = useState<Track>(() => {
     try { return localStorage.getItem('track') === 'math' ? 'math' : 'rw' } catch { return 'rw' }
@@ -25,9 +29,19 @@ export default function Learn() {
 
   useEffect(() => {
     ensureUser().then(() => rpc<Home>('get_home')).then((h) => {
-      if (!h.profile.onboarded) router.replace('/onboarding')
-      else setHome(h)
-      return rpc<Quest[]>('get_quests').then(setQuests)
+      if (!h.profile.onboarded) { router.replace('/onboarding'); return }
+      setHome(h)
+      const sb = supabase()
+      return Promise.all([
+        rpc<Quest[]>('get_quests').then(setQuests),
+        rpc<League>('get_league').then(setLeague),
+        sb.from('mocks').select('result').eq('status', 'completed').order('completed_at', { ascending: false }).limit(1)
+          .then(({ data }) => setMock(data?.[0]?.result?.total ?? null)),
+        // A lesson started in the last day and left unfinished: the stats bar offers to resume it.
+        sb.from('sessions').select('id, mistakes_left').eq('mode', 'lesson').eq('status', 'active').gt('pos', 0)
+          .gt('created_at', new Date(Date.now() - 86_400_000).toISOString()).order('created_at', { ascending: false }).limit(1)
+          .then(({ data }) => setOpenLesson(data?.[0] ?? null)),
+      ])
     }).catch((e) => setError(e.message))
   }, [router, version])
 
@@ -77,7 +91,7 @@ export default function Learn() {
       <main className="w-full max-w-[600px] space-y-6">
         <h1 className="sr-only">Your learning path</h1>
         <div className="space-y-4 xl:hidden">
-          <Stats home={home} />
+          <StatsBar home={home} open={openLesson} />
           {diagnostic}
         </div>
 
@@ -95,42 +109,14 @@ export default function Learn() {
 
         <Path units={units} section={track} busy={busy} onStart={start} onClaim={claim} />
       </main>
-      <aside aria-label="Your stats" className="sticky top-6 hidden w-[360px] shrink-0 space-y-4 self-start xl:block">
-        <Stats home={home} />
+      {/* Scrolls on its own when taller than the window, so every card stays reachable while it sticks. */}
+      <aside aria-label="Your stats" className="sticky top-6 hidden max-h-[calc(100dvh-3rem)] w-[360px] shrink-0 space-y-4 self-start overflow-y-auto xl:block">
+        <StatsBar home={home} open={openLesson} />
         {diagnostic}
-        {quests.length > 0 && <DailyQuests quests={quests} />}
+        <LeagueCard league={league} />
+        {quests.length > 0 && <DailyQuests quests={quests} id="rail-quests" viewAll />}
+        <CountdownCard home={home} mock={mock} />
       </aside>
-    </div>
-  )
-}
-
-function DiagnosticCard({ busy, onStart }: { busy: boolean; onStart: () => void }) {
-  return (
-    <section aria-labelledby="diag" className="space-y-3 rounded-2xl border-2 border-border bg-surface p-4">
-      <h2 id="diag" className="font-semibold">Find your starting point</h2>
-      <p className="text-sm text-text-muted">A 24-question diagnostic (about 25 minutes) moves you ahead in the units you already know.</p>
-      <Button className="w-full" disabled={busy} onClick={onStart}>Take the diagnostic</Button>
-    </section>
-  )
-}
-
-const Coin = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} aria-hidden fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5v9M9.5 10a2.5 2 0 012.5-1.5c1.4 0 2.5.7 2.5 1.7 0 2.3-5 1.3-5 3.6 0 1 1.1 1.7 2.5 1.7a2.5 2 0 002.5-1.5" /></svg>
-)
-
-function Stats({ home }: { home: Home }) {
-  const { profile } = home
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-border bg-surface p-3">
-      <div className="flex items-center gap-2" aria-label={`${profile.streak}-day streak`}>
-        <span className={`grid size-10 place-items-center rounded-full ${profile.done_today ? 'bg-primary text-on-primary' : 'bg-locked-bg text-on-locked'}`}><Flame className="size-5" /></span>
-        <span className="font-semibold">{profile.streak} day{profile.streak === 1 ? '' : 's'}</span>
-        {profile.freezes > 0 && <span className="text-sm text-text-muted">· {profile.freezes} freeze{profile.freezes > 1 ? 's' : ''}</span>}
-      </div>
-      <GoalRing value={home.today_points} goal={profile.daily_goal} />
-      <p className="flex items-center gap-1.5 font-semibold">
-        <Coin className="size-6" />{profile.coins}<span className="sr-only"> {CURRENCY}</span>
-      </p>
     </div>
   )
 }

@@ -24,18 +24,15 @@ export function ProgressBar({ value, max, label }: { value: number; max: number;
   )
 }
 
-/** Daily-goal ring. */
-export function GoalRing({ value, goal }: { value: number; goal: number }) {
+/** Daily-goal ring (decorative: the number beside it carries the value). */
+export function GoalRing({ value, goal, size = 40 }: { value: number; goal: number; size?: number }) {
   const r = 16, c = 2 * Math.PI * r, f = Math.min(1, value / goal)
   return (
-    <div className="flex items-center gap-2" title="Daily goal">
-      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden>
-        <circle cx="20" cy="20" r={r} fill="none" strokeWidth="5" className="stroke-track" />
-        <circle cx="20" cy="20" r={r} fill="none" strokeWidth="5" strokeLinecap="round" className="stroke-primary"
-          strokeDasharray={c} strokeDashoffset={c * (1 - f)} transform="rotate(-90 20 20)" />
-      </svg>
-      <span className="text-sm"><span className="font-semibold">{value}</span>/{goal} pts today</span>
-    </div>
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden>
+      <circle cx="20" cy="20" r={r} fill="none" strokeWidth="5" className="stroke-track" />
+      <circle cx="20" cy="20" r={r} fill="none" strokeWidth="5" strokeLinecap="round" className="stroke-ring-progress"
+        strokeDasharray={c} strokeDashoffset={c * (1 - f)} transform="rotate(-90 20 20)" />
+    </svg>
   )
 }
 
