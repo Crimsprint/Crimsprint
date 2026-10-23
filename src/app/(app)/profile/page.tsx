@@ -5,7 +5,7 @@ import { MORE } from '@/components/AppShell'
 import { ACCESSORIES, AVATARS, Avatar, type Accessory } from '@/components/Avatar'
 import { Alert, Button, Screen } from '@/components/ui'
 import { ACHIEVEMENTS } from '@/lib/achievements'
-import { ensureUser, rpc, type Profile } from '@/lib/supabase'
+import { requireUser, rpc, signOut, type Profile } from '@/lib/supabase'
 
 const NAME = /^[A-Za-z0-9][A-Za-z0-9 ._-]{1,18}[A-Za-z0-9]$/ // same rule as the profiles.display_name check
 
@@ -17,7 +17,7 @@ export default function ProfilePage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    ensureUser().then(() => rpc<Profile>('get_profile')).then((x) => {
+    requireUser().then(() => rpc<Profile>('get_profile')).then((x) => {
       setP(x)
       setForm({ name: x.display_name ?? '', avatar: x.avatar, accessory: x.accessory ?? '' })
     }).catch((e) => setError(e.message))
@@ -119,6 +119,7 @@ export default function ProfilePage() {
           {[{ href: '/shop', label: 'Shop' }, ...MORE].map((m) => (
             <li key={m.href}><Link href={m.href} className="flex min-h-12 items-center justify-between px-4 font-semibold">{m.label}<span aria-hidden>›</span></Link></li>
           ))}
+          <li><button onClick={signOut} className="flex min-h-12 w-full items-center px-4 font-semibold">Sign out</button></li>
         </ul>
       </nav>
     </Screen>

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
-import { ensureUser, rpc, supabase } from '@/lib/supabase'
+import { requireUser, rpc, supabase } from '@/lib/supabase'
 
 type MockRow = { id: string; status: string; created_at: string; result: { total: { low: number; high: number } } | null }
 
@@ -14,7 +14,7 @@ export default function MockHome() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    ensureUser().then(() => supabase().from('mocks').select('id, status, created_at, result').order('created_at', { ascending: false }))
+    requireUser().then(() => supabase().from('mocks').select('id, status, created_at, result').order('created_at', { ascending: false }))
       .then(({ data, error }) => (error ? setError(error.message) : setMocks(data as MockRow[])))
       .catch((e) => setError(e.message))
   }, [])

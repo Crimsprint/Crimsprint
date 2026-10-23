@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRef, useState, type ReactNode } from 'react'
+import { signOut } from '@/lib/supabase'
 
 const ICONS = {
   learn: 'M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',
@@ -34,7 +35,6 @@ export const MORE = [
   { href: '/mock', label: 'Mock test' },
   { href: '/progress', label: 'Progress' },
   { href: '/settings', label: 'Settings' },
-  { href: '/account', label: 'Save progress' },
   { href: '/help', label: 'Help' },
 ]
 // On phones Shop and the More pages live inside Profile, so Profile stays highlighted there.
@@ -63,6 +63,7 @@ function More({ active }: { active: boolean }) {
               <Link href={m.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 font-semibold hover:bg-nav-active">{m.label}</Link>
             </li>
           ))}
+          <li><button onClick={signOut} className="block w-full rounded-lg px-3 py-2 text-left font-semibold hover:bg-nav-active">Sign out</button></li>
         </ul>
       )}
     </div>

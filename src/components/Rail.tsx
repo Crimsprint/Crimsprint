@@ -8,7 +8,7 @@ import type { Home } from '@/lib/supabase'
 
 export type League = { opted_out: true } | {
   opted_out: false; tier: number; tier_name: string; week_end: string; promote: number; demote: number
-  members: { handle: string; points: number; me: boolean }[]
+  members: { name: string; points: number; me: boolean }[]
 }
 /** An unfinished lesson the learner can go back to, with its remaining mistakes. */
 export type OpenLesson = { id: string; mistakes_left: number } | null

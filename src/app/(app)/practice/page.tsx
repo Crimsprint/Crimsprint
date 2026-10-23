@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
-import { ensureUser, rpc } from '@/lib/supabase'
+import { requireUser, rpc } from '@/lib/supabase'
 
 type Practice = { due_reviews: number; mistakes: number; timer_passes: number }
 // SAT pace (docs/sat-spec.md §2), matching start_session's drill deadline.
@@ -26,7 +26,7 @@ export default function PracticePage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    ensureUser().then(() => rpc<Practice>('get_practice')).then(setP).catch((e) => setError(e.message))
+    requireUser().then(() => rpc<Practice>('get_practice')).then(setP).catch((e) => setError(e.message))
   }, [])
 
   async function start(args: Record<string, unknown>) {

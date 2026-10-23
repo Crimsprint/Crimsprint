@@ -4,7 +4,7 @@ import { ACCESSORIES, Avatar, type Accessory } from '@/components/Avatar'
 import { NavIcon } from '@/components/AppShell'
 import { Alert, Button, Flame, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
-import { ensureUser, rpc, type Profile } from '@/lib/supabase'
+import { requireUser, rpc, type Profile } from '@/lib/supabase'
 
 // Rules mirror buy_item (supabase/migrations/0007_pages_shop_drills.sql): freezes max 2, consumables max 3, accessories once.
 const POWER_UPS = [
@@ -21,7 +21,7 @@ export default function ShopPage() {
   const [version, setVersion] = useState(0)
 
   useEffect(() => {
-    ensureUser().then(() => rpc<Profile>('get_profile')).then(setP).catch((e) => setError(e.message))
+    requireUser().then(() => rpc<Profile>('get_profile')).then(setP).catch((e) => setError(e.message))
   }, [version])
 
   async function buy(item: string, name: string) {

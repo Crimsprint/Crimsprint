@@ -1,27 +1,11 @@
-'use client'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Alert, Button, Screen } from '@/components/ui'
+'use client' // reads the public Supabase config, which lives in a client module
+import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { configured, ensureUser, rpc, type Home } from '@/lib/supabase'
+import { Screen } from '@/components/ui'
+import { configured } from '@/lib/supabase'
 
+// Signed-in learners never see this page: src/proxy.ts sends them to /learn.
 export default function Landing() {
-  const router = useRouter()
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-
-  async function start() {
-    setBusy(true)
-    setError('')
-    try {
-      await ensureUser()
-      const home = await rpc<Home>('get_home')
-      router.push(home.profile.onboarded ? '/learn' : '/onboarding')
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
-      setBusy(false)
-    }
-  }
 
   return (
     <Screen className="flex flex-col justify-center gap-8">
@@ -37,13 +21,15 @@ export default function Landing() {
         <li>• Every answer explained, including why the wrong ones are wrong</li>
       </ul>
       {configured ? (
-        <Button onClick={start} disabled={busy}>{busy ? 'Starting…' : 'Get started'}</Button>
+        <div className="space-y-3">
+          <Link href="/onboarding" className="grid min-h-12 place-items-center rounded-xl bg-primary px-5 font-semibold uppercase tracking-wide text-on-primary">Get started</Link>
+          <Link href="/login" className="grid min-h-12 place-items-center rounded-xl border-2 border-border bg-surface px-5 font-semibold uppercase tracking-wide">I already have an account</Link>
+        </div>
       ) : (
         <p role="alert" className="rounded-xl border-2 border-border bg-surface p-4">
           Supabase isn’t configured yet. Copy <code>.env.example</code> to <code>.env.local</code>, fill in your project URL and publishable key, then restart the dev server.
         </p>
       )}
-      {error && <Alert title="Couldn’t start">{error}</Alert>}
       <p className="text-xs text-text-muted">Not affiliated with College Board, the SAT, or any university. SAT is a trademark of College Board.</p>
     </Screen>
   )

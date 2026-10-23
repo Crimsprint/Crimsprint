@@ -6,7 +6,7 @@ const FAQ = [
   ['How do streaks work?', 'Finish at least one lesson a day to extend your streak. You earn a streak freeze at 7, 14, 30 and 50 days (you can hold 2), and one covers a single missed day automatically.'],
   ['What are leagues?', 'Each week you’re grouped with up to 30 learners. The top 7 by points move up a league and the bottom 5 move down. You can leave leagues any time.'],
   ['Is the mock test score official?', 'No. It is an estimate from our own questions and scoring model, not a College Board score.'],
-  ['How do I keep my progress?', 'You start as a guest. Use Save progress to add your email so you can sign in on another device.'],
+  ['How do I keep my progress?', 'Everything is saved to your Google sign-in. Sign in with the same Google account on any device to pick up where you left off.'],
 ]
 
 export default function HelpPage() {

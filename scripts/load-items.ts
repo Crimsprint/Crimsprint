@@ -1,5 +1,7 @@
 // Loads supabase/seed-items.json into a hosted project through the validated admin RPC (no database password needed).
 // Run: node scripts/load-items.ts, then mark the printed user id as admin in SQL. Skills must already exist.
+// It signs in anonymously, so anonymous sign-ins must be switched on in Supabase Auth while it runs (they are off in
+// production: the app is Google sign-in only). Loading supabase/seed.sql with psql needs no sign-in at all.
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 import type { Item } from './math-templates.ts'

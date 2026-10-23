@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Tex } from '@/components/Tex'
 import { Alert, Button, Screen } from '@/components/ui'
-import { ensureUser, rpc, supabase } from '@/lib/supabase'
+import { requireUser, rpc, supabase } from '@/lib/supabase'
 
 type Item = {
   id?: string; skill_id: string; subskill_id: string | null; tier: 'easy' | 'medium' | 'hard'; kind: 'mcq' | 'spr'; status: string
@@ -40,7 +40,7 @@ export default function Admin() {
   const [version, setVersion] = useState(0)
 
   useEffect(() => {
-    ensureUser().then((u) => {
+    requireUser().then((u) => {
       setUid(u.id)
       return Promise.all([rpc<Report[]>('admin_reports'), supabase().from('skills').select('id, name').order('sort')])
     }).then(([r, s]) => { setReports(r); setSkills(s.data ?? []) })

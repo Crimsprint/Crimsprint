@@ -1,9 +1,10 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useId, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
-import { ensureUser, rpc } from '@/lib/supabase'
+import { saveDraft, type Draft } from '@/lib/onboardingDraft'
+import { currentUser, rpc, type Home } from '@/lib/supabase'
 
 const STEPS = ['goal', 'date', 'scores', 'daily', 'diagnostic'] as const
 type Step = (typeof STEPS)[number]
@@ -42,6 +43,11 @@ function Onboarding() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
+  // Signed-in learners who have already onboarded go straight to their path. Guests trigger no database calls.
+  useEffect(() => {
+    currentUser().then((u) => u && rpc<Home>('get_home')).then((h) => h && h.profile.onboarded && router.replace('/learn')).catch(() => {})
+  }, [router])
+
   const answered: Record<Step, boolean> = {
     goal: goal !== null,
     date: noDate || date !== '',
@@ -56,14 +62,21 @@ function Onboarding() {
 
   async function finish(diagnostic: boolean) {
     setBusy(true)
+    const draft: Draft = {
+      p_goal: goal!, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
+      p_target: Number(target), p_daily_goal: daily!, p_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    }
+    const next = diagnostic ? '/diagnostic' : '/learn'
     try {
-      await ensureUser()
-      await rpc('save_onboarding', {
-        p_goal: goal, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
-        p_target: Number(target), p_daily_goal: daily, p_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      })
-      if (diagnostic) router.push(`/session/${await rpc<string>('start_session', { p_mode: 'diagnostic' })}`)
-      else router.push('/learn')
+      if (await currentUser()) {
+        // Already signed in (they reached onboarding after Google sign-in): save straight away.
+        await rpc('save_onboarding', draft)
+        router.push(next)
+      } else {
+        // Guests: keep the answers in this browser only and sign in first; /auth/finish saves them.
+        saveDraft(draft)
+        router.push(`/login?next=${encodeURIComponent(next)}`)
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
       setBusy(false)

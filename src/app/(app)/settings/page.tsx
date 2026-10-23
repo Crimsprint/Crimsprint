@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Alert, Button, Screen } from '@/components/ui'
 import { DAILY_GOALS } from '@/lib/goals'
-import { ensureUser, rpc, supabase } from '@/lib/supabase'
+import { requireUser, rpc, supabase } from '@/lib/supabase'
 
 type Profile = { goal: string | null; current_score: number | null; target_score: number | null; test_date: string | null; daily_goal: number; timezone: string }
 
@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    ensureUser().then((u) => supabase().from('profiles').select('goal, current_score, target_score, test_date, daily_goal, timezone').eq('id', u.id).single())
+    requireUser().then((u) => supabase().from('profiles').select('goal, current_score, target_score, test_date, daily_goal, timezone').eq('id', u.id).single())
       .then(({ data, error }) => (error ? setError(error.message) : setP(data as Profile)))
       .catch((e) => setError(e.message))
   }, [])

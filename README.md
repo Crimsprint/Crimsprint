@@ -6,8 +6,8 @@ Design docs: [docs/duolingo-mechanics-map.md](docs/duolingo-mechanics-map.md) �
 
 ## Setup
 
-1. Create a Supabase project. In **Authentication → Sign In / Providers**, turn on **Allow anonymous sign-ins**.
-2. In the Supabase **SQL editor**, run the files in [`supabase/migrations/`](supabase/migrations/) in order, then [`supabase/seed.sql`](supabase/seed.sql). Alternatively, insert only the skills and load the questions with `node scripts/load-items.ts`, which signs in once and waits for you to make the printed user an admin. That's how the hosted project was seeded.
+1. Create a Supabase project. Sign-in is Google only: in **Authentication → Sign In / Providers**, enable **Google** (with an OAuth client from Google Cloud) and leave **anonymous sign-ins off**. Set **Authentication → URL Configuration** to your site URL, with `<site>/auth/callback` among the redirect URLs.
+2. In the Supabase **SQL editor**, run the files in [`supabase/migrations/`](supabase/migrations/) in order, then [`supabase/seed.sql`](supabase/seed.sql). (`node scripts/load-items.ts` is the older loader; it needs anonymous sign-ins on while it runs.)
 3. Copy `.env.example` to `.env.local` and fill in the project URL and publishable key. Optionally add a Desmos API key for the graphing calculator; without one, a built-in scientific calculator is used.
 4. Run the app:
 
@@ -19,7 +19,9 @@ npm install
 npm run dev
 ```
 
-5. To use `/admin`, open it once, then run the `update … set is_admin = true` statement it shows you in the SQL editor.
+5. To use `/admin`, sign in, open it once, then run the `update … set is_admin = true` statement it shows you in the SQL editor.
+
+Signed-out visitors can open only `/`, `/onboarding`, `/login` and `/auth/callback` (`src/proxy.ts`). Onboarding answers stay in the browser until Google sign-in; `/auth/finish` then saves them in one write.
 
 ## Layout
 
@@ -30,7 +32,7 @@ npm run dev
 | `scripts/math-templates*.ts` | Original math item templates; each answer computed and checked by substitution |
 | `data/items/rw.json`, `data/items/rw/*.json` | Original Reading and Writing items (compact format: key first, rationales in order) |
 | `scripts/build-seed.ts` | Validates all items and writes `data/items/math.json` and `supabase/seed.sql` (`npm run seed`) |
-| `supabase/migrations/0006_*.sql`, `0007_*.sql` | Learning path (units, chests, unit tests, diagnostic placement); profile, shop, weekly quests, timed drills, review-every-mistake |
+| `supabase/migrations/0006_*.sql`, `0007_*.sql`, `0008_*.sql` | Learning path (units, chests, unit tests, diagnostic placement); profile, shop, weekly quests, timed drills, review-every-mistake; Google-only accounts |
 | `src/app/globals.css` | The only place colors are defined (theme tokens, light/dark) |
 | `design/raccoon-source.png` → `scripts/mascot.ts` | Mascot cut-out, head badge, favicon and the six avatar colors (recolored from the token file) |
 | `scripts/trace.ts` | Traces the mascot into `public/mascot/raccoon.svg` (four flat colors) |
