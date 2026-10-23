@@ -45,3 +45,10 @@ export type Home = {
   units: Record<string, { practice_done: boolean; chest_claimed: boolean; test_passed: boolean }>
 }
 export type Tier = 'easy' | 'medium' | 'hard'
+
+/** get_profile: the profile page and shop. */
+export type Profile = {
+  display_name: string | null; handle: string; avatar: string; accessory: string | null; joined: string
+  coins: number; freezes: number; streak: number; longest_streak: number; total_points: number; league: string | null
+  inventory: Record<string, number>; prices: Record<string, number>; achievements: { code: string; earned_at: string }[]
+}

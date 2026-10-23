@@ -75,11 +75,12 @@ describe('chests', () => {
     await run(u, ['unit_practice', null, null, 'rw.sec'])
     await expect(claim()).rejects.toThrow(/not available/) // medium round still to do
     for (const skill of ['rw.sec.boundaries', 'rw.sec.form']) await run(u, ['lesson', skill, 'medium'])
+    const before = (await one<{ coins: number }>('select coins from public.profiles where id = $1', [u])).coins // quests pay Coins too
     expect(await claim()).toBe(20)
     await expect(claim()).rejects.toThrow(/not available/)
-    expect(await one('select coins from public.profiles where id = $1', [u])).toEqual({ coins: 20 })
+    expect(await one('select coins from public.profiles where id = $1', [u])).toEqual({ coins: before + 20 })
     expect(await as(u, () => rpc('get_home'))).toMatchObject({
-      profile: { coins: 20 }, units: { 'rw.sec': { practice_done: true, chest_claimed: true, test_passed: false } },
+      profile: { coins: before + 20 }, units: { 'rw.sec': { practice_done: true, chest_claimed: true, test_passed: false } },
     })
   })
 })

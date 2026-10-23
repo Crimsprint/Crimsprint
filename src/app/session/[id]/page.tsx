@@ -13,16 +13,39 @@ type Item = {
   id: string; kind: 'mcq' | 'spr'; passage: string | null; stem: string; tier: string; skill: string; section: 'rw' | 'math'
   choices: { id: string; text: string }[] | null
 }
-type Next = { done: true } | { done: false; index: number; total: number; mode: string; mistakes_left: number | null; item: Item }
+type Next = { done: true } | {
+  done: false; index: number; total: number; mode: string; mistakes_left: number | null; item: Item
+  deadline: string | null; server_now: string  // timed drills only
+}
 type Feedback = { done: boolean; correct?: boolean; correct_answer?: string; explanation?: string; rationale?: string | null; mistakes_left?: number | null }
 type Summary = {
-  mode: string; status: string; passed: boolean; points: number; correct: number; total: number; ms: number; skill: string | null
+  mode: string; status: string; passed: boolean; points: number; correct: number; total: number; planned: number; ms: number; skill: string | null
   mastery_before: number; mastery_after: number | null; missed: number; streak: number; today_points: number; daily_goal: number
   domains: { domain: string; mastery: number }[] | null
 }
 const LETTERS = ['A', 'B', 'C', 'D']
 // SAT grid-in characters; length is checked by the server (5, or 6 with a minus sign).
 const SPR_CHARS = /^-?[0-9./]*$/
+
+/** Drill clock. `skew` corrects for the device clock differing from the server's. */
+function Countdown({ deadline, skew, onExpire }: { deadline: number; skew: number; onExpire: () => void }) {
+  const left = () => Math.max(0, Math.ceil((deadline - (Date.now() + skew)) / 1000))
+  const [secs, setSecs] = useState(left)
+  useEffect(() => {
+    const t = setInterval(() => {
+      const s = left()
+      setSecs(s)
+      if (s === 0) { clearInterval(t); onExpire() }
+    }, 1000)
+    return () => clearInterval(t)
+  })
+  return (
+    <span role="timer" aria-label={`${Math.floor(secs / 60)} minutes ${secs % 60} seconds left`}
+      className={`shrink-0 rounded-lg px-2 py-1 text-sm tabular-nums ${secs < 60 ? 'bg-primary font-bold text-on-primary' : 'font-semibold'}`}>
+      {Math.floor(secs / 60)}:{String(secs % 60).padStart(2, '0')}{secs < 60 && <span className="sr-only"> (under a minute)</span>}
+    </span>
+  )
+}
 
 function SessionPlayer() {
   const { id } = useParams<{ id: string }>()
@@ -34,6 +57,8 @@ function SessionPlayer() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const shownAt = useRef(0)
+  const [skew, setSkew] = useState(0)
+  const [expired, setExpired] = useState(false)
   const continueRef = useRef<HTMLButtonElement>(null)
 
   // Bumped to fetch the next item.
@@ -52,12 +77,19 @@ function SessionPlayer() {
         if (live) setSummary(sm)
       } else {
         setCur(n)
+        setSkew(Date.parse(n.server_now) - Date.now())
         shownAt.current = Date.now()
       }
     }).catch((e) => live && setError(e instanceof Error ? e.message : String(e)))
     return () => { live = false }
   }, [id, step])
   useEffect(() => { if (fb) continueRef.current?.focus() }, [fb])
+  // A drill whose clock ran out ends here, with whatever was answered in time.
+  useEffect(() => {
+    if (!expired) return
+    rpc<Summary>('complete_session', { p_session: id }).then((sm) => { setCur(null); setSummary(sm) })
+      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
+  }, [expired, id])
 
   async function submit() {
     if (!cur || !answer || busy) return
@@ -67,7 +99,9 @@ function SessionPlayer() {
       if (cur.mode === 'diagnostic') next()  // no feedback during the diagnostic
       else setFb(r)
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      const msg = e instanceof Error ? e.message : String(e)
+      if (/time is up/.test(msg)) setExpired(true)
+      else setError(msg)
     } finally {
       setBusy(false)
     }
@@ -89,6 +123,7 @@ function SessionPlayer() {
         <div className="flex items-center gap-3">
           <Link href="/learn" aria-label="Quit session" className="grid size-10 shrink-0 place-items-center rounded-full"><XIcon className="size-5" /></Link>
           <ProgressBar value={cur.index + (fb ? 1 : 0)} max={cur.total} label={`Question ${cur.index + 1} of ${cur.total}`} />
+          {cur.deadline && <Countdown deadline={Date.parse(cur.deadline)} skew={skew} onExpire={() => setExpired(true)} />}
           {cur.mistakes_left != null && (() => {
             const left = fb?.mistakes_left ?? cur.mistakes_left
             return <span className="shrink-0 text-sm font-semibold" aria-label={`${left} mistakes left`}>{left} ✕ left</span>
@@ -176,10 +211,13 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
     : s.status === 'failed' ? 'Out of mistakes for this lesson'
     : s.mode === 'unit_test' ? (s.passed ? 'Unit test passed!' : 'Not quite: 8 of 10 passes the unit test')
     : s.mode === 'unit_practice' ? 'Practice complete'
+    : s.mode === 'drill' ? (s.total < s.planned ? 'Time’s up!' : 'Drill complete')
+    : s.mode === 'mistakes' ? 'Mistakes reviewed'
     : s.passed ? 'Level complete!' : 'Lesson complete'
   return (
     <Screen className="space-y-6">
       <h1 className="text-3xl font-bold">{title}</h1>
+      {s.mode === 'drill' && <p>You answered {s.total} of {s.planned} questions in time.</p>}
       {s.status === 'failed' && <p>No lockout: take a short break, then try the lesson again. Every miss is in your review queue.</p>}
       <dl className="grid grid-cols-2 gap-3">
         {[

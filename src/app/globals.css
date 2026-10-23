@@ -45,6 +45,8 @@
   --color-nav-active-border: var(--crimson);
   --color-ring-progress: var(--crimson);
   --color-scrim: var(--ink);
+  --color-zone-up: var(--crimson);         /* league divider lines; each also carries a text label */
+  --color-zone-down: var(--slate);
   --color-chart-1: var(--crimson);
   --color-chart-2: var(--slate);
   --color-chart-3: var(--chocolate);
@@ -76,6 +78,7 @@
     --color-nav-active: var(--gray-900);
     --color-nav-active-border: var(--gray-200); /* crimson lines fail 3:1 on ink */
     --color-ring-progress: var(--gray-200);
+    --color-zone-up: var(--gray-200);
   }
 }
 :root[data-theme="dark"] {
@@ -96,6 +99,7 @@
   --color-nav-active: var(--gray-900);
   --color-nav-active-border: var(--gray-200);
   --color-ring-progress: var(--gray-200);
+  --color-zone-up: var(--gray-200);
 }
 
 @keyframes bob {

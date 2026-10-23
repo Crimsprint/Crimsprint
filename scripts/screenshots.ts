@@ -46,7 +46,8 @@ async function until(expression: string, what: string) {
   for (let i = 0; i < 100; i++) { if (await evaluate<boolean>(expression)) return; await sleep(150) }
   throw new Error(`timed out waiting for ${what} on ${await evaluate('location.pathname')}`)
 }
-const settled = `document.readyState === 'complete' && !/Loading/.test(document.body.innerText)`
+const settled = `document.readyState === 'complete' && !/Loading|Checking/.test(document.body.innerText)
+  && [...document.images].every((i) => i.complete || i.getBoundingClientRect().top > innerHeight)`
 async function go(path: string) {
   await cdp('Page.navigate', { url: BASE + path })
   await sleep(300)

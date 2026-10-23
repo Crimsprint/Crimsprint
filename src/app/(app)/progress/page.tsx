@@ -1,8 +1,8 @@
 'use client'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Screen } from '@/components/ui'
 import { Bars, pct } from '@/components/Bars'
-import { ACHIEVEMENTS } from '@/lib/achievements'
 import { ensureUser, rpc, type Home } from '@/lib/supabase'
 
 type Progress = {
@@ -34,7 +34,6 @@ export default function ProgressPage() {
     const ss = h.skills.filter((s) => s.domain === d)
     return { label: d, value: ss.reduce((a, s) => a + s.mastery, 0) / ss.length }
   })
-  const earned = new Set(p.achievements?.map((a) => a.code))
 
   return (
     <Screen wide className="space-y-8">
@@ -81,17 +80,7 @@ export default function ProgressPage() {
           rows={p.mocks.map((m) => ({ label: new Date(m.completed_at).toLocaleDateString(), value: m.total.estimate }))} />
       )}
 
-      <section className="space-y-3">
-        <h2 className="text-xl font-bold">Achievements</h2>
-        <ul className="grid grid-cols-2 gap-3">
-          {Object.entries(ACHIEVEMENTS).map(([code, a]) => (
-            <li key={code} className={`rounded-xl p-3 ${earned.has(code) ? 'bg-accent text-on-accent' : 'border-2 border-dashed border-border text-text-muted'}`}>
-              <p className="font-semibold">{a.title}{earned.has(code) ? '' : ' (locked)'}</p>
-              <p className="text-sm">{a.how}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <p className="text-text-muted">Achievements are on your <Link href="/profile" className="font-semibold text-text underline">profile</Link>.</p>
     </Screen>
   )
 }

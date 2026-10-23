@@ -1,8 +1,9 @@
 // Builds the mascot assets from design/raccoon-source.png (shield on a near-black background).
 // Run: node scripts/mascot.ts. Writes public/mascot/raccoon.png (transparent), public/mascot/raccoon-head.png (round head badge)
-// and src/app/icon.png (favicon).
+// src/app/icon.png (favicon) and public/mascot/avatar-<color>.png (profile avatars).
 import sharp from 'sharp'
 import assert from 'node:assert'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const path = (p: string) => fileURLToPath(new URL(p, import.meta.url))
@@ -63,4 +64,25 @@ const badge = await sharp({ create: { width: D, height: D, channels: 4, backgrou
   .composite([{ input: head }, { input: mask, blend: 'dest-in' }]).png().toBuffer()
 await sharp(badge).resize(256, 256).toFile(path('../public/mascot/raccoon-head.png'))
 await sharp(badge).resize(64, 64).toFile(path('../src/app/icon.png'))
+
+// Profile avatars: the head badge with the shield red swapped for another palette color, read from the token file.
+// Anti-aliased edges keep their mix: a pixel that is 40% red becomes 40% of the new color.
+const tokens = Object.fromEntries([...readFileSync(path('../src/app/globals.css'), 'utf8').matchAll(/--([a-z0-9-]+):\s*#([0-9A-Fa-f]{6})/g)]
+  .map(([, name, hex]) => [name, [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16))]))
+const small = await sharp(badge).resize(256, 256).raw().toBuffer()
+const redness = red.r - Math.max(red.g, red.b)
+for (const [avatar, token] of [['crimson', null], ['slate', 'slate'], ['chocolate', 'chocolate'], ['green', 'green'], ['ink', 'ink'], ['putty', 'putty']] as const) {
+  const px = Buffer.from(small)
+  if (token) {
+    const to = tokens[token]
+    assert(to, `token --${token} not found in globals.css`)
+    for (let i = 0; i < px.length; i += 4) {
+      const t = Math.max(0, Math.min(1, (px[i] - Math.max(px[i + 1], px[i + 2])) / redness))
+      if (!t) continue
+      const rest = (px[i + 1] + px[i + 2]) / 2
+      for (let c = 0; c < 3; c++) px[i + c] = Math.round(to[c] * t + rest * (1 - t))
+    }
+  }
+  await sharp(px, { raw: { width: 256, height: 256, channels: 4 } }).png().toFile(path(`../public/mascot/avatar-${avatar}.png`))
+}
 console.log('mascot assets written')

@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Path, type StartArgs } from '@/components/Path'
-import { DailyQuests, type Quest } from '@/components/Quests'
+import { QuestList, type Quest } from '@/components/Quests'
 import { CountdownCard, DiagnosticCard, LeagueCard, StatsBar, type LatestMock, type League, type OpenLesson } from '@/components/Rail'
 import { Alert, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
@@ -114,7 +114,7 @@ export default function Learn() {
         <StatsBar home={home} open={openLesson} />
         {diagnostic}
         <LeagueCard league={league} />
-        {quests.length > 0 && <DailyQuests quests={quests} id="rail-quests" viewAll />}
+        {quests.length > 0 && <QuestList quests={quests} id="rail-quests" reward={5} viewAll />}
         <CountdownCard home={home} mock={mock} />
       </aside>
     </div>
