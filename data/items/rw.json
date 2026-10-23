@@ -1,0 +1,434 @@
+[
+  {
+    "skill": "rw.ii.central", "subskill": "rw.ii.central.main", "tier": "easy", "kind": "mcq",
+    "passage": "Marisol Vega, a ceramicist in a small coastal town, fires her pottery in a wood-burning kiln that takes three days to cool. She could switch to an electric kiln and finish pieces in hours, but she says the slow cooling creates glaze patterns she cannot predict or reproduce. For Vega, that unpredictability is the point: each bowl records the particular conditions of its firing.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      { "id": "A", "text": "Vega values her wood-burning kiln because it produces glazes that cannot be repeated." },
+      { "id": "B", "text": "Electric kilns are more efficient than wood-burning kilns." },
+      { "id": "C", "text": "Vega plans to switch to an electric kiln to save time." },
+      { "id": "D", "text": "Most ceramicists in coastal towns use wood-burning kilns." }
+    ],
+    "answer": { "choice": "A" },
+    "explanation": "The text explains why Vega keeps a slow wood-burning kiln: its cooling produces unpredictable, one-of-a-kind glazes, which she sees as the point.",
+    "rationales": {
+      "B": "The text mentions that electric kilns are faster, but that is a supporting detail, not the main idea.",
+      "C": "The text says she could switch but chooses not to.",
+      "D": "The text says nothing about what most ceramicists do."
+    }
+  },
+  {
+    "skill": "rw.ii.central", "subskill": "rw.ii.central.main", "tier": "easy", "kind": "mcq",
+    "passage": "In 1998, the town of Linden Falls converted an abandoned rail line into a walking path. City planners expected only modest use, but within five years the path averaged more than two thousand visitors a day. Shops along the route reopened, and the town later extended the path into two neighboring counties.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      { "id": "A", "text": "Planners in Linden Falls are usually wrong about public projects." },
+      { "id": "B", "text": "A path built on an old rail line was far more popular than expected and benefited the area." },
+      { "id": "C", "text": "The rail line was abandoned because shops along it had closed." },
+      { "id": "D", "text": "Neighboring counties built walking paths before Linden Falls did." }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "The text describes the path's unexpected popularity and its effects: reopened shops and an extension into nearby counties.",
+    "rationales": {
+      "A": "One wrong estimate does not show planners are usually wrong; this overgeneralizes.",
+      "C": "The text never explains why the rail line was abandoned.",
+      "D": "The text says Linden Falls extended its path into those counties, not that they built paths first."
+    }
+  },
+  {
+    "skill": "rw.ii.evidence", "subskill": "rw.ii.evidence.textual", "tier": "medium", "kind": "mcq",
+    "passage": "Biologist Ren Okafor has recorded the songs of a population of sparrows on Kesh Island for six years. She noticed that a young bird's song often resembles the songs of birds in neighboring territories more than the songs of its parents. Okafor hypothesizes that the sparrows learn new song variations mainly from neighbors rather than from their parents.",
+    "stem": "Which finding, if true, would most directly support Okafor's hypothesis?",
+    "choices": [
+      { "id": "A", "text": "Sparrows on Kesh Island sing more often in spring than in autumn." },
+      { "id": "B", "text": "Young sparrows raised only with their parents sang their parents' song variations." },
+      { "id": "C", "text": "Young sparrows raised apart from their parents but near unrelated adults sang the adults' variations." },
+      { "id": "D", "text": "Kesh Island has more songbird species than the nearby mainland." }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "If birds separated from their parents still pick up the songs of unrelated nearby adults, then neighbors, not parents, are the source of learning, which is exactly Okafor's hypothesis.",
+    "rationales": {
+      "A": "When birds sing says nothing about whom they learn from.",
+      "B": "This shows birds can learn from parents, which does not support learning mainly from neighbors.",
+      "D": "The number of species is unrelated to how sparrows learn songs."
+    }
+  },
+  {
+    "skill": "rw.ii.evidence", "subskill": "rw.ii.evidence.textual", "tier": "medium", "kind": "mcq",
+    "passage": "Some historians argue that the spread of affordable bicycles in the late nineteenth century changed how young people in rural areas chose marriage partners. Before bicycles, the argument goes, most people married someone from their own village; afterward, they could easily travel to court someone in a nearby town.",
+    "stem": "Which finding, if true, would most strongly support the historians' argument?",
+    "choices": [
+      { "id": "A", "text": "Bicycles cost more in cities than in rural areas at the time." },
+      { "id": "B", "text": "The average distance between spouses' birthplaces stayed the same throughout the period." },
+      { "id": "C", "text": "Many young people used bicycles mainly for racing." },
+      { "id": "D", "text": "Marriage records show the average distance between spouses' birthplaces rose sharply after bicycles became affordable." }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "The argument predicts that people began marrying partners from farther away once bicycles were common. Rising distances between spouses' birthplaces after that point would directly support it.",
+    "rationales": {
+      "A": "Price differences between cities and rural areas do not address whom people married.",
+      "B": "Unchanged distances would weaken the argument, not support it.",
+      "C": "How bicycles were mainly used does not show any change in marriage patterns."
+    }
+  },
+  {
+    "skill": "rw.ii.inferences", "subskill": "rw.ii.inferences.complete", "tier": "hard", "kind": "mcq",
+    "passage": "Engineers testing a new road surface found that it reduced tire noise by 40 percent compared with standard asphalt. However, the new surface also wore down twice as fast while costing about the same to install. A city that has received many complaints about traffic noise from residents along one highway, and that can afford more frequent repaving there, would therefore most likely ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      { "id": "A", "text": "find the new surface useful along that highway, while expecting to replace it more often." },
+      { "id": "B", "text": "avoid the new surface because it costs more to install than standard asphalt." },
+      { "id": "C", "text": "choose the new surface because it lasts longer than standard asphalt." },
+      { "id": "D", "text": "conclude that tire noise is unrelated to the type of road surface." }
+    ],
+    "answer": { "choice": "A" },
+    "explanation": "The surface solves the city's noise problem, and the city can afford the faster wear, so it would likely use the surface there and accept more frequent replacement.",
+    "rationales": {
+      "B": "The text says installation costs are about the same.",
+      "C": "The text says the new surface wears down faster, not slower.",
+      "D": "The test showed the surface does change tire noise."
+    }
+  },
+  {
+    "skill": "rw.ii.inferences", "subskill": "rw.ii.inferences.complete", "tier": "hard", "kind": "mcq",
+    "passage": "Archaeologists excavating an ancient settlement found grinding stones with traces of wild barley dated to about 11,000 years ago. The earliest domesticated barley in the region appears only in layers roughly 1,500 years younger. Because the grinding stones show heavy, repeated use, the researchers concluded that the settlement's inhabitants ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      { "id": "A", "text": "never ate barley of any kind." },
+      { "id": "B", "text": "domesticated barley before they began gathering wild barley." },
+      { "id": "C", "text": "regularly processed wild barley long before domesticated barley appeared there." },
+      { "id": "D", "text": "used the grinding stones only for decoration." }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "Heavily used stones with wild barley residue, about 1,500 years older than the first domesticated barley, indicate that people regularly processed wild barley well before cultivation.",
+    "rationales": {
+      "A": "Barley traces on heavily used grinding stones show that barley was processed.",
+      "B": "This reverses the order shown by the dated layers.",
+      "D": "Heavy, repeated use with food residue indicates practical use, not decoration."
+    }
+  },
+  {
+    "skill": "rw.cs.wic", "subskill": "rw.cs.wic.choice", "tier": "easy", "kind": "mcq",
+    "passage": "The committee's report was so ______ that readers could find the answers to their questions in just a few minutes: every section was short, clearly labeled, and free of unnecessary detail.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": [
+      { "id": "A", "text": "lengthy" },
+      { "id": "B", "text": "concise" },
+      { "id": "C", "text": "ornate" },
+      { "id": "D", "text": "secretive" }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "Short sections free of unnecessary detail describe a concise report.",
+    "rationales": {
+      "A": "A lengthy report contradicts \"every section was short.\"",
+      "C": "\"Ornate\" means elaborately decorated, the opposite of free of unnecessary detail.",
+      "D": "Nothing suggests the report hid information; readers found answers quickly."
+    }
+  },
+  {
+    "skill": "rw.cs.wic", "subskill": "rw.cs.wic.choice", "tier": "easy", "kind": "mcq",
+    "passage": "Although the hiking trail looked ______ on the map, its steep switchbacks and loose rocks made it one of the most demanding routes in the park, and many visitors turned back before reaching the top.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": [
+      { "id": "A", "text": "treacherous" },
+      { "id": "B", "text": "crowded" },
+      { "id": "C", "text": "manageable" },
+      { "id": "D", "text": "unmarked" }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "\"Although\" sets up a contrast with how demanding the trail really was, so on the map it must have looked manageable.",
+    "rationales": {
+      "A": "\"Treacherous\" agrees with the trail's real difficulty, so it does not create the contrast that \"Although\" requires.",
+      "B": "How crowded the trail looked does not contrast with its difficulty.",
+      "D": "The trail appears on the map, and \"unmarked\" does not contrast with being demanding."
+    }
+  },
+  {
+    "skill": "rw.cs.structure", "subskill": "rw.cs.structure.function", "tier": "medium", "kind": "mcq",
+    "passage": "Most people assume that deserts are silent places. In fact, wind moving across certain sand dunes can produce a low hum that is audible from far away. Researchers have found that the sound occurs only when sand grains of a particular size slide down a dune's face together, vibrating in unison.",
+    "stem": "Which choice best describes the function of the first sentence in the overall structure of the text?",
+    "choices": [
+      { "id": "A", "text": "It states a finding that the researchers later confirm." },
+      { "id": "B", "text": "It presents a common belief that the rest of the text complicates." },
+      { "id": "C", "text": "It gives an example that supports the text's final claim." },
+      { "id": "D", "text": "It describes a method the researchers used." }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "The first sentence states what most people assume, and \"In fact\" introduces evidence that deserts can produce sound, complicating that belief.",
+    "rationales": {
+      "A": "The researchers' work challenges the idea in the first sentence rather than confirming it.",
+      "C": "The first sentence is a belief, not an example, and it runs against the final claim.",
+      "D": "No research method is described in the first sentence."
+    }
+  },
+  {
+    "skill": "rw.cs.structure", "subskill": "rw.cs.structure.purpose", "tier": "medium", "kind": "mcq",
+    "passage": "Translator Ilse Brandt kept a notebook of words that had no direct equivalent in English. Over twenty years, the notebook grew to more than four hundred entries. Rather than inventing new English words, Brandt usually described each term in a short phrase, believing that a careful explanation preserved more of the original meaning than a coined word could.",
+    "stem": "Which choice best states the main purpose of the text?",
+    "choices": [
+      { "id": "A", "text": "To argue that English needs more invented words" },
+      { "id": "B", "text": "To compare the size of different languages' vocabularies" },
+      { "id": "C", "text": "To explain why Brandt stopped working as a translator" },
+      { "id": "D", "text": "To describe a translator's practice and the reasoning behind it" }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "The text describes what Brandt did (kept a notebook and explained untranslatable words in phrases) and why (explanations preserve more meaning).",
+    "rationales": {
+      "A": "Brandt avoided inventing words; the text does not argue for them.",
+      "B": "No vocabularies are compared.",
+      "C": "The text never says Brandt stopped translating."
+    }
+  },
+  {
+    "skill": "rw.cs.crosstext", "subskill": "rw.cs.crosstext.respond", "tier": "hard", "kind": "mcq",
+    "passage": "Text 1\nMany city planners favor adding lanes to crowded highways. More lanes, they argue, give cars room to spread out, so traffic should move faster and commutes should become shorter.\n\nText 2\nTransportation researcher Dana Imre studied highways that were widened over the past thirty years. She found that within a few years the new lanes were as congested as the old ones had been, because faster commutes encouraged more people to drive.",
+    "stem": "Based on the texts, how would Imre (Text 2) most likely respond to the planners' argument in Text 1?",
+    "choices": [
+      { "id": "A", "text": "She would agree that wider highways permanently shorten commutes." },
+      { "id": "B", "text": "She would argue that any improvement in commute times is likely to be temporary because widening attracts more drivers." },
+      { "id": "C", "text": "She would argue that cities should stop building highways of any kind." },
+      { "id": "D", "text": "She would claim that highways were less crowded thirty years ago because they had more lanes." }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "Imre found that added lanes filled up again within a few years as more people drove, so she would say the faster traffic planners predict does not last.",
+    "rationales": {
+      "A": "Her findings show the benefit does not last.",
+      "C": "Text 2 makes no recommendation about building highways in general.",
+      "D": "Text 2 does not compare highways thirty years ago by number of lanes."
+    }
+  },
+  {
+    "skill": "rw.cs.crosstext", "subskill": "rw.cs.crosstext.respond", "tier": "hard", "kind": "mcq",
+    "passage": "Text 1\nSome nutrition writers claim that eating breakfast speeds up metabolism, so people who skip it are likely to gain weight.\n\nText 2\nIn a twelve-week study led by nutrition scientist Paolo Reyes, adults were randomly assigned either to eat breakfast or to skip it. Both groups ate about the same total number of calories each day, and their weight changes did not differ. Reyes cautions that the study was short and did not include children.",
+    "stem": "Based on the texts, how would Reyes (Text 2) most likely respond to the claim in Text 1?",
+    "choices": [
+      { "id": "A", "text": "He would say his findings prove the claim for all age groups." },
+      { "id": "B", "text": "He would say the claim is true only for adults." },
+      { "id": "C", "text": "He would say his findings do not support the claim, while noting limits on what his study can show." },
+      { "id": "D", "text": "He would say people should remove breakfast from their diets." }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "Reyes found no weight difference between adults who ate breakfast and those who skipped it, which contradicts the claim, but he notes the study was short and excluded children.",
+    "rationales": {
+      "A": "His study found no effect, and it excluded children.",
+      "B": "His results did not support the claim even for the adults he studied.",
+      "D": "Finding no difference does not mean breakfast should be removed."
+    }
+  },
+  {
+    "skill": "rw.eoi.transitions", "subskill": "rw.eoi.transitions.contrast", "tier": "easy", "kind": "mcq",
+    "passage": "Hummingbirds have extremely fast metabolisms and must feed every few minutes during the day. ______ at night they can enter a sleeplike state called torpor, lowering their body temperature to save energy.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": [
+      { "id": "A", "text": "For example," },
+      { "id": "B", "text": "However," },
+      { "id": "C", "text": "Similarly," },
+      { "id": "D", "text": "As a result," }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "Constant daytime feeding contrasts with slowing down at night, so a contrast transition fits.",
+    "rationales": {
+      "A": "Entering torpor at night is not an example of frequent daytime feeding.",
+      "C": "Torpor is the opposite of frequent feeding, not something similar to it.",
+      "D": "Frequent feeding does not cause torpor; the sentences contrast."
+    }
+  },
+  {
+    "skill": "rw.eoi.transitions", "subskill": "rw.eoi.transitions.cause", "tier": "easy", "kind": "mcq",
+    "passage": "The museum's new wing was designed to let in as much natural light as possible. ______ the architects installed tall windows along every outside wall and added skylights above the main gallery.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": [
+      { "id": "A", "text": "Nevertheless," },
+      { "id": "B", "text": "In contrast," },
+      { "id": "C", "text": "To that end," },
+      { "id": "D", "text": "Still," }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "The windows and skylights are the means of achieving the stated goal, so \"To that end\" fits.",
+    "rationales": {
+      "A": "\"Nevertheless\" signals something done despite the first sentence, but the windows serve its goal.",
+      "B": "Nothing in the second sentence contrasts with the first.",
+      "D": "\"Still\" implies a concession, but there is no tension between the sentences."
+    }
+  },
+  {
+    "skill": "rw.eoi.transitions", "subskill": "rw.eoi.transitions.cause", "tier": "medium", "kind": "mcq",
+    "passage": "Early telephone networks required an operator to connect every call by hand. As the number of subscribers grew, this system became slow and expensive to run. ______ engineers developed automatic switches that could connect calls without an operator.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": [
+      { "id": "A", "text": "Nonetheless," },
+      { "id": "B", "text": "For instance," },
+      { "id": "C", "text": "Likewise," },
+      { "id": "D", "text": "Consequently," }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "The slow, expensive manual system led to the development of automatic switches, a cause-and-effect relationship.",
+    "rationales": {
+      "A": "\"Nonetheless\" signals that something happened despite the problem, but the problem prompted the switches.",
+      "B": "Automatic switches are a response to the problem, not an example of it.",
+      "C": "The switches are not similar to the manual system; they replace it."
+    }
+  },
+  {
+    "skill": "rw.eoi.transitions", "subskill": "rw.eoi.transitions.contrast", "tier": "medium", "kind": "mcq",
+    "passage": "Recycled plastic can be turned into durable building materials such as fence posts and park benches. ______ these products are difficult to recycle again, so critics argue that the process mainly delays the plastic's arrival in a landfill.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": [
+      { "id": "A", "text": "However," },
+      { "id": "B", "text": "Therefore," },
+      { "id": "C", "text": "In other words," },
+      { "id": "D", "text": "For this reason," }
+    ],
+    "answer": { "choice": "A" },
+    "explanation": "The first sentence presents a benefit and the second a drawback, so a contrast transition is needed.",
+    "rationales": {
+      "B": "Being durable does not cause the products to be hard to recycle.",
+      "C": "The second sentence adds a new point rather than restating the first.",
+      "D": "The benefit in the first sentence is not the reason for the drawback."
+    }
+  },
+  {
+    "skill": "rw.eoi.synthesis", "subskill": "rw.eoi.synthesis.notes", "tier": "hard", "kind": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n• The Kestrel River Bridge opened in 1931.\n• It is a suspension bridge with a main span of 420 meters.\n• The Ardon Bridge opened in 1964.\n• It is a cable-stayed bridge with a main span of 610 meters.",
+    "stem": "The student wants to emphasize a difference in length between the two bridges' main spans. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      { "id": "A", "text": "The Kestrel River Bridge opened in 1931, and the Ardon Bridge opened in 1964." },
+      { "id": "B", "text": "The Kestrel River Bridge is a suspension bridge, while the Ardon Bridge is cable-stayed." },
+      { "id": "C", "text": "The Ardon Bridge has a main span of 610 meters." },
+      { "id": "D", "text": "The Ardon Bridge's main span (610 meters) is 190 meters longer than that of the Kestrel River Bridge (420 meters)." }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "Only this choice gives both span lengths and states the difference (610 − 420 = 190 meters).",
+    "rationales": {
+      "A": "This compares opening dates, not span lengths.",
+      "B": "This compares bridge types, not span lengths.",
+      "C": "This gives one length without any comparison."
+    }
+  },
+  {
+    "skill": "rw.eoi.synthesis", "subskill": "rw.eoi.synthesis.notes", "tier": "hard", "kind": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n• Composer Lena Haas wrote her first symphony at age 19.\n• The symphony premiered in Vienna in 1902.\n• Critics praised its unusual use of the harp.\n• Haas later wrote three operas.",
+    "stem": "The student wants to introduce Haas's first symphony to an audience unfamiliar with Haas. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      { "id": "A", "text": "Critics praised the unusual use of the harp." },
+      { "id": "B", "text": "Lena Haas, a composer who later wrote three operas, completed her first symphony at age 19; it premiered in Vienna in 1902." },
+      { "id": "C", "text": "The symphony premiered in Vienna in 1902." },
+      { "id": "D", "text": "Haas wrote three operas after her symphony premiered." }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "An unfamiliar audience needs to know who Haas is and what the symphony is. This choice identifies her as a composer and introduces the symphony with its key facts.",
+    "rationales": {
+      "A": "This does not say which work is meant or who Haas is.",
+      "C": "This does not identify Haas for an unfamiliar audience.",
+      "D": "This focuses on the operas rather than introducing the symphony."
+    }
+  },
+  {
+    "skill": "rw.sec.boundaries", "subskill": "rw.sec.boundaries.sentence", "tier": "easy", "kind": "mcq",
+    "passage": "The project, organized by a local high school, aims to restore shade along the water. Last month the volunteers planted two hundred oak seedlings along the ______ next spring they will return to measure how many survived the winter.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "riverbank," },
+      { "id": "B", "text": "riverbank" },
+      { "id": "C", "text": "riverbank, and," },
+      { "id": "D", "text": "riverbank;" }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "Two independent clauses (\"the volunteers planted…\" and \"next spring they will return…\") can be joined with a semicolon.",
+    "rationales": {
+      "A": "A comma alone between two independent clauses creates a comma splice.",
+      "B": "With no punctuation, the two independent clauses run together.",
+      "C": "The comma after \"and\" is incorrect; it separates the conjunction from the clause it introduces."
+    }
+  },
+  {
+    "skill": "rw.sec.boundaries", "subskill": "rw.sec.boundaries.semicolon_colon", "tier": "easy", "kind": "mcq",
+    "passage": "Glass frogs, found in the forests of Central and South America, get their name from their translucent ______ on some species, the heart and digestive organs are visible through the skin of the belly.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "undersides:" },
+      { "id": "B", "text": "undersides," },
+      { "id": "C", "text": "undersides" },
+      { "id": "D", "text": "undersides, which" }
+    ],
+    "answer": { "choice": "A" },
+    "explanation": "The second clause explains what \"translucent undersides\" means, and a colon correctly introduces an independent clause that explains the first.",
+    "rationales": {
+      "B": "A comma alone between two independent clauses creates a comma splice.",
+      "C": "With no punctuation, the two independent clauses run together.",
+      "D": "\"Which\" makes the second part a relative clause that does not fit grammatically with \"on some species, the heart…\"."
+    }
+  },
+  {
+    "skill": "rw.sec.form", "subskill": "rw.sec.form.sv", "tier": "medium", "kind": "mcq",
+    "passage": "After the expedition returned, its members donated their journals and maps to the city. The collection of letters written by the explorer's crew members ______ now housed in the city's maritime museum.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "are" },
+      { "id": "B", "text": "were" },
+      { "id": "C", "text": "is" },
+      { "id": "D", "text": "have been" }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "The subject is the singular noun \"collection,\" not \"letters\" or \"members,\" so the singular verb \"is\" is required.",
+    "rationales": {
+      "A": "\"Are\" is plural; it agrees with \"members,\" which is not the subject.",
+      "B": "\"Were\" is plural and also shifts to the past tense, which conflicts with \"now.\"",
+      "D": "\"Have been\" is plural and does not agree with \"collection.\""
+    }
+  },
+  {
+    "skill": "rw.sec.form", "subskill": "rw.sec.form.pronoun", "tier": "medium", "kind": "mcq",
+    "passage": "This year's regional science fair focused on clean water. Each of the student teams presented ______ design for a low-cost water filter to a panel of local engineers.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "it's" },
+      { "id": "B", "text": "its" },
+      { "id": "C", "text": "they're" },
+      { "id": "D", "text": "their" }
+    ],
+    "answer": { "choice": "B" },
+    "explanation": "The antecedent is \"Each,\" which is singular, so the singular possessive \"its\" is needed.",
+    "rationales": {
+      "A": "\"It's\" means \"it is,\" not a possessive.",
+      "C": "\"They're\" means \"they are,\" not a possessive.",
+      "D": "\"Their\" is plural and does not agree with the singular \"Each.\""
+    }
+  },
+  {
+    "skill": "rw.sec.boundaries", "subskill": "rw.sec.boundaries.supplements", "tier": "hard", "kind": "mcq",
+    "passage": "Painter Hiroshi Tanabe, who spent a decade studying the traditional mineral pigments of his region ______ grinds his own colors from stones he collects on long mountain hikes.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "region—" },
+      { "id": "B", "text": "region;" },
+      { "id": "C", "text": "region" },
+      { "id": "D", "text": "region," }
+    ],
+    "answer": { "choice": "D" },
+    "explanation": "The clause \"who spent a decade… region\" interrupts the main sentence and opens with a comma, so it must close with a matching comma before the verb \"grinds.\"",
+    "rationales": {
+      "A": "A dash cannot close an interruption that opened with a comma.",
+      "B": "A semicolon would separate the subject \"Tanabe\" from its verb \"grinds.\"",
+      "C": "Without a closing comma, the interruption runs into the main clause."
+    }
+  },
+  {
+    "skill": "rw.sec.form", "subskill": "rw.sec.form.modifier", "tier": "hard", "kind": "mcq",
+    "passage": "The expedition had been planned for nearly three years, and its members had studied every route to the peak in detail. Having trained for months in high-altitude conditions, ______",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      { "id": "A", "text": "the summit was reached by the team of climbers two days ahead of schedule." },
+      { "id": "B", "text": "two days ahead of schedule, the summit was reached by the climbers." },
+      { "id": "C", "text": "the team of climbers reached the summit two days ahead of schedule." },
+      { "id": "D", "text": "the schedule was beaten by two days by the team of climbers." }
+    ],
+    "answer": { "choice": "C" },
+    "explanation": "The modifier \"Having trained for months…\" must be followed directly by the people who trained: the team of climbers.",
+    "rationales": {
+      "A": "This makes \"the summit\" the thing that trained for months: a dangling modifier.",
+      "B": "This places \"two days ahead of schedule\" and then \"the summit\" after the modifier, so it still dangles.",
+      "D": "This makes \"the schedule\" the thing that trained: a dangling modifier."
+    }
+  }
+]

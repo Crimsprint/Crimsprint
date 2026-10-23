@@ -1,0 +1,397 @@
+{
+  "version": 1,
+  "spec": "docs/sat-spec.md",
+  "notes": "Section, domain and skill names and shares are official (Assessment Framework for the Digital SAT Suite v4, Sept 2026). Sub-skills marked source=assumption and all tier descriptors are our own design.",
+  "tiers": {
+    "easy": "Single step, direct cue, short/simple stimulus.",
+    "medium": "Two steps or one distractor that traps a common misconception.",
+    "hard": "Multi-step, abstract or dense stimulus, several plausible distractors."
+  },
+  "sections": [
+    {
+      "id": "rw",
+      "name": "Reading and Writing",
+      "operationalQuestions": 50,
+      "modules": { "count": 2, "questions": 27, "operational": 25, "pretest": 2, "minutes": 32 },
+      "domains": [
+        {
+          "id": "rw.ii",
+          "name": "Information and Ideas",
+          "share": 0.26,
+          "questionRange": [12, 14],
+          "skills": [
+            {
+              "id": "rw.ii.central",
+              "name": "Central Ideas and Details",
+              "source": "official",
+              "tierDescriptors": { "easy": "Main idea stated explicitly.", "medium": "Main idea must be synthesized from several sentences.", "hard": "Complex literary or dense informational text; distractors are true but too narrow." },
+              "subskills": [
+                { "id": "rw.ii.central.main", "name": "Identify the central idea", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.ii.central.detail", "name": "Locate a supporting detail", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.ii.evidence",
+              "name": "Command of Evidence",
+              "source": "official",
+              "tierDescriptors": { "easy": "One claim, one clearly matching quotation or data point.", "medium": "Must distinguish support from mere relevance.", "hard": "Weaken/strengthen logic or multi-series graph with partial matches." },
+              "subskills": [
+                { "id": "rw.ii.evidence.textual", "name": "Textual evidence", "source": "official", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.ii.evidence.quantitative", "name": "Quantitative evidence (table, bar graph, line graph)", "source": "official", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.ii.inferences",
+              "name": "Inferences",
+              "source": "official",
+              "tierDescriptors": { "easy": "Conclusion follows from one stated fact.", "medium": "Combine two premises.", "hard": "Eliminate over-reaching conclusions in an abstract argument." },
+              "subskills": [
+                { "id": "rw.ii.inferences.complete", "name": "Logically complete the text", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rw.cs",
+          "name": "Craft and Structure",
+          "share": 0.28,
+          "questionRange": [13, 15],
+          "skills": [
+            {
+              "id": "rw.cs.wic",
+              "name": "Words in Context",
+              "source": "official",
+              "tierDescriptors": { "easy": "Common tier-two word, strong context clue.", "medium": "Secondary meaning of a familiar word.", "hard": "Precise connotation among near-synonyms in dense text." },
+              "subskills": [
+                { "id": "rw.cs.wic.meaning", "name": "Meaning of a word in context", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.cs.wic.choice", "name": "Most precise word to complete the text", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.cs.structure",
+              "name": "Text Structure and Purpose",
+              "source": "official",
+              "tierDescriptors": { "easy": "Overall purpose of a short informational text.", "medium": "Function of an underlined sentence.", "hard": "Overall structure of a literary or argumentative text." },
+              "subskills": [
+                { "id": "rw.cs.structure.purpose", "name": "Overall purpose", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.cs.structure.function", "name": "Function of a sentence or part", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.cs.structure.overall", "name": "Overall structure", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.cs.crosstext",
+              "name": "Cross-Text Connections",
+              "source": "official",
+              "tierDescriptors": { "easy": "Texts openly agree or disagree.", "medium": "Predict how author 2 responds to a specific claim.", "hard": "Partial agreement or qualification between texts." },
+              "subskills": [
+                { "id": "rw.cs.crosstext.respond", "name": "How one author would respond to another", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rw.eoi",
+          "name": "Expression of Ideas",
+          "share": 0.20,
+          "questionRange": [8, 12],
+          "skills": [
+            {
+              "id": "rw.eoi.synthesis",
+              "name": "Rhetorical Synthesis",
+              "source": "official",
+              "tierDescriptors": { "easy": "Goal names the exact note to use.", "medium": "Goal requires combining two notes.", "hard": "Goal is a comparison or emphasis among many notes." },
+              "subskills": [
+                { "id": "rw.eoi.synthesis.notes", "name": "Use notes to meet a stated goal", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.eoi.transitions",
+              "name": "Transitions",
+              "source": "official",
+              "tierDescriptors": { "easy": "Plain contrast or addition.", "medium": "Cause/effect vs sequence.", "hard": "Subtle relationship (concession, exemplification, specification)." },
+              "subskills": [
+                { "id": "rw.eoi.transitions.contrast", "name": "Contrast and concession", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.eoi.transitions.cause", "name": "Cause and effect", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.eoi.transitions.addition", "name": "Addition, sequence and example", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rw.sec",
+          "name": "Standard English Conventions",
+          "share": 0.26,
+          "questionRange": [11, 15],
+          "skills": [
+            {
+              "id": "rw.sec.boundaries",
+              "name": "Boundaries",
+              "source": "official",
+              "tierDescriptors": { "easy": "Obvious run-on or fragment.", "medium": "Colon/semicolon/dash choice.", "hard": "Long sentence with nested supplements and no needed punctuation." },
+              "subskills": [
+                { "id": "rw.sec.boundaries.sentence", "name": "Sentence boundaries (run-ons, fragments)", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.boundaries.semicolon_colon", "name": "Semicolons, colons and dashes", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.boundaries.supplements", "name": "Supplements and appositives", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.boundaries.none", "name": "No punctuation needed", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "rw.sec.form",
+              "name": "Form, Structure, and Sense",
+              "source": "official",
+              "tierDescriptors": { "easy": "Agreement with adjacent subject.", "medium": "Agreement across an intervening phrase; tense consistency.", "hard": "Dangling modifiers, collective nouns, finite vs nonfinite verbs." },
+              "subskills": [
+                { "id": "rw.sec.form.sv", "name": "Subject-verb agreement", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.form.pronoun", "name": "Pronoun-antecedent agreement", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.form.tense", "name": "Verb tense, aspect and form", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.form.possessive", "name": "Plurals and possessives", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "rw.sec.form.modifier", "name": "Modifier placement", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "name": "Math",
+      "operationalQuestions": 40,
+      "modules": { "count": 2, "questions": 22, "operational": 20, "pretest": 2, "minutes": 35 },
+      "domains": [
+        {
+          "id": "math.alg",
+          "name": "Algebra",
+          "share": 0.35,
+          "questionRange": [13, 15],
+          "formats": { "mc": [10, 11], "spr": [3, 4] },
+          "skills": [
+            {
+              "id": "math.alg.lin1",
+              "name": "Linear equations in one variable",
+              "source": "official",
+              "tierDescriptors": { "easy": "Solve in 1–2 steps.", "medium": "Fractions/distribution or build from context.", "hard": "Number of solutions with a parameter." },
+              "subskills": [
+                { "id": "math.alg.lin1.solve", "name": "Solve", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.lin1.model", "name": "Create from context", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.lin1.solutions", "name": "Number of solutions", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.alg.lin2",
+              "name": "Linear equations in two variables",
+              "source": "official",
+              "tierDescriptors": { "easy": "Plug in a value.", "medium": "Build equation from context.", "hard": "Interpret coefficients under unit changes." },
+              "subskills": [
+                { "id": "math.alg.lin2.model", "name": "Create from context", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.lin2.interpret", "name": "Interpret solutions and coefficients", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.alg.linfn",
+              "name": "Linear functions",
+              "source": "official",
+              "tierDescriptors": { "easy": "Evaluate f(x).", "medium": "Find function from table/graph; interpret slope.", "hard": "Composition or parallel/perpendicular conditions." },
+              "subskills": [
+                { "id": "math.alg.linfn.evaluate", "name": "Evaluate", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.linfn.represent", "name": "Between table, graph and equation", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.linfn.interpret", "name": "Interpret slope and intercept", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.alg.systems",
+              "name": "Systems of two linear equations in two variables",
+              "source": "official",
+              "tierDescriptors": { "easy": "Solve by substitution.", "medium": "Build system from context.", "hard": "No/infinite solutions with a parameter." },
+              "subskills": [
+                { "id": "math.alg.systems.solve", "name": "Solve", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.systems.model", "name": "Create from context", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.systems.solutions", "name": "Number of solutions", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.alg.ineq",
+              "name": "Linear inequalities in one or two variables",
+              "source": "official",
+              "tierDescriptors": { "easy": "Solve one-variable inequality.", "medium": "Build from context.", "hard": "Region in the xy-plane / system of inequalities." },
+              "subskills": [
+                { "id": "math.alg.ineq.solve", "name": "Solve", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.ineq.model", "name": "Create from context", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.alg.ineq.graph", "name": "Graph regions", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "math.adv",
+          "name": "Advanced Math",
+          "share": 0.35,
+          "questionRange": [13, 15],
+          "formats": { "mc": [10, 11], "spr": [3, 4] },
+          "skills": [
+            {
+              "id": "math.adv.equiv",
+              "name": "Equivalent expressions",
+              "source": "official",
+              "tierDescriptors": { "easy": "Expand or combine like terms.", "medium": "Factor; exponent rules.", "hard": "Rational/radical rewrite to reveal a parameter." },
+              "subskills": [
+                { "id": "math.adv.equiv.polynomial", "name": "Expand, factor and simplify polynomials", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.equiv.exponents", "name": "Rational exponents and radicals", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.equiv.rational", "name": "Rational expressions", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.adv.nonlin_eq",
+              "name": "Nonlinear equations in one variable and systems of equations in two variables",
+              "source": "official",
+              "tierDescriptors": { "easy": "Solve a factorable quadratic.", "medium": "Quadratic formula / discriminant; radical equation.", "hard": "Linear-quadratic system; extraneous solutions." },
+              "subskills": [
+                { "id": "math.adv.nonlin_eq.quadratic", "name": "Quadratic equations", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.nonlin_eq.radical_rational", "name": "Radical, rational and absolute value equations", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.nonlin_eq.systems", "name": "Linear-nonlinear systems", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.adv.nonlin_fn",
+              "name": "Nonlinear functions",
+              "source": "official",
+              "tierDescriptors": { "easy": "Evaluate a quadratic/exponential function.", "medium": "Vertex, zeros, growth rate from form.", "hard": "Transformations; exponential model interpretation." },
+              "subskills": [
+                { "id": "math.adv.nonlin_fn.quadratic", "name": "Quadratic functions and graphs", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.nonlin_fn.exponential", "name": "Exponential growth and decay", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.nonlin_fn.polynomial", "name": "Polynomial zeros and factors", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.adv.nonlin_fn.transform", "name": "Function transformations", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "math.psda",
+          "name": "Problem-Solving and Data Analysis",
+          "share": 0.15,
+          "questionRange": [5, 7],
+          "formats": { "mc": [4, 5], "spr": [1, 2] },
+          "skills": [
+            {
+              "id": "math.psda.ratios",
+              "name": "Ratios, rates, proportional relationships, and units",
+              "source": "official",
+              "tierDescriptors": { "easy": "Single proportion.", "medium": "Unit conversion chain.", "hard": "Rates with compound units or density." },
+              "subskills": [
+                { "id": "math.psda.ratios.proportion", "name": "Proportions and rates", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.ratios.units", "name": "Unit conversion", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.percent",
+              "name": "Percentages",
+              "source": "official",
+              "tierDescriptors": { "easy": "Percent of a number.", "medium": "Percent change.", "hard": "Successive changes / reverse percent." },
+              "subskills": [
+                { "id": "math.psda.percent.of", "name": "Percent of a quantity", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.percent.change", "name": "Percent increase and decrease", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.onevar",
+              "name": "One-variable data: distributions and measures of center and spread",
+              "source": "official",
+              "tierDescriptors": { "easy": "Mean/median of a list.", "medium": "Effect of an outlier.", "hard": "Compare standard deviations of distributions." },
+              "subskills": [
+                { "id": "math.psda.onevar.center", "name": "Mean, median and mode", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.onevar.spread", "name": "Range and standard deviation", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.twovar",
+              "name": "Two-variable data: models and scatterplots",
+              "source": "official",
+              "tierDescriptors": { "easy": "Read a scatterplot.", "medium": "Use line of best fit to predict.", "hard": "Linear vs exponential model choice." },
+              "subskills": [
+                { "id": "math.psda.twovar.scatter", "name": "Scatterplots and line of best fit", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.twovar.models", "name": "Linear vs exponential models", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.prob",
+              "name": "Probability and conditional probability",
+              "source": "official",
+              "tierDescriptors": { "easy": "Simple probability.", "medium": "Two-way table.", "hard": "Conditional probability from a two-way table." },
+              "subskills": [
+                { "id": "math.psda.prob.simple", "name": "Simple probability", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.prob.conditional", "name": "Two-way tables and conditional probability", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.inference",
+              "name": "Inference from sample statistics and margin of error",
+              "source": "official",
+              "tierDescriptors": { "easy": "Scale a sample proportion to a population.", "medium": "Interpret a margin of error.", "hard": "Effect of sample size on margin of error." },
+              "subskills": [
+                { "id": "math.psda.inference.estimate", "name": "Estimate population parameters", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.psda.inference.moe", "name": "Margin of error", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.psda.claims",
+              "name": "Evaluating statistical claims: observational studies and experiments",
+              "source": "official",
+              "tierDescriptors": { "easy": "Random sample vs not.", "medium": "Generalize to which population.", "hard": "Causation vs association." },
+              "subskills": [
+                { "id": "math.psda.claims.design", "name": "Study design and conclusions", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "math.geo",
+          "name": "Geometry and Trigonometry",
+          "share": 0.15,
+          "questionRange": [5, 7],
+          "formats": { "mc": [4, 5], "spr": [1, 2] },
+          "skills": [
+            {
+              "id": "math.geo.area",
+              "name": "Area and volume",
+              "source": "official",
+              "tierDescriptors": { "easy": "Formula from the reference sheet.", "medium": "Composite figure.", "hard": "Scale factor effect on area/volume." },
+              "subskills": [
+                { "id": "math.geo.area.area", "name": "Area and perimeter", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.geo.area.volume", "name": "Volume and surface area", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.geo.lines",
+              "name": "Lines, angles, and triangles",
+              "source": "official",
+              "tierDescriptors": { "easy": "Vertical/supplementary angles.", "medium": "Parallel lines and a transversal.", "hard": "Similar triangles with proportional sides." },
+              "subskills": [
+                { "id": "math.geo.lines.angles", "name": "Angle relationships", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.geo.lines.similar", "name": "Congruence and similarity", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.geo.trig",
+              "name": "Right triangles and trigonometry",
+              "source": "official",
+              "tierDescriptors": { "easy": "Pythagorean theorem.", "medium": "SOH-CAH-TOA; special right triangles.", "hard": "sin x = cos(90° − x); radians." },
+              "subskills": [
+                { "id": "math.geo.trig.pythagorean", "name": "Pythagorean theorem and special right triangles", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.geo.trig.ratios", "name": "Trigonometric ratios", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            },
+            {
+              "id": "math.geo.circles",
+              "name": "Circles",
+              "source": "official",
+              "tierDescriptors": { "easy": "Circumference/area.", "medium": "Arc length, sector area, radians.", "hard": "Circle equation by completing the square." },
+              "subskills": [
+                { "id": "math.geo.circles.arcs", "name": "Arcs, sectors and angles", "source": "assumption", "tiers": ["easy", "medium", "hard"] },
+                { "id": "math.geo.circles.equation", "name": "Circle equations in the xy-plane", "source": "assumption", "tiers": ["easy", "medium", "hard"] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/* Token file: the only place colors are defined. Harvard palette (colors only, no affiliation implied)
+   plus one non-Harvard green for success. Components use the semantic tokens below via Tailwind classes. */
+:root {
+  --crimson: #A51C30;
+  --ink: #1E1E1E;
+  --white: #FFFFFF;
+  --gray-900: #252727;
+  --gray-700: #3D3D3D;
+  --gray-200: #D6D6D7;
+  --gray-50: #F0F0F2;
+  --putty: #D7D1CB;
+  --slate: #8996A0;
+  --chocolate: #422E1C;
+  --green: #1E7B4A;
+  color-scheme: light;
+}
+
+@theme {
+  --color-*: initial; /* disable Tailwind's default palette so only tokens exist */
+  --color-bg: var(--gray-50);
+  --color-surface: var(--white);
+  --color-surface-muted: var(--putty);
+  --color-text: var(--ink);
+  --color-text-muted: var(--gray-700);
+  --color-border: var(--gray-200);
+  --color-track: var(--gray-200);
+  --color-primary: var(--crimson);          /* fills only, never text */
+  --color-on-primary: var(--white);
+  --color-success: var(--green);
+  --color-on-success: var(--white);
+  --color-danger: var(--crimson);           /* always paired with an icon + label */
+  --color-on-danger: var(--white);
+  --color-locked: var(--slate);             /* icons / large elements only */
+  --color-locked-bg: var(--gray-200);
+  --color-on-locked: var(--ink);
+  --color-accent: var(--chocolate);         /* achievement badges only */
+  --color-on-accent: var(--white);
+  --color-focus: var(--ink);
+  --color-node-current-bg: var(--white);
+  --color-node-current-ring: var(--crimson);
+  --color-chart-1: var(--crimson);
+  --color-chart-2: var(--slate);
+  --color-chart-3: var(--chocolate);
+  --color-chart-4: var(--putty);
+  --color-chart-5: var(--green);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode: OS preference unless the user picked light; or an explicit dark pick.
+   Crimson on ink is 2.23:1, so in dark mode it is used only as a filled background (no rings or thin lines). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: var(--ink);
+    --color-surface: var(--gray-900);
+    --color-surface-muted: var(--gray-700);
+    --color-text: var(--white);
+    --color-text-muted: var(--gray-200);
+    --color-border: var(--gray-700);
+    --color-track: var(--gray-700);
+    --color-locked-bg: var(--gray-700);
+    --color-on-locked: var(--white);
+    --color-focus: var(--white);
+    --color-node-current-bg: var(--crimson);
+    --color-node-current-ring: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: var(--ink);
+  --color-surface: var(--gray-900);
+  --color-surface-muted: var(--gray-700);
+  --color-text: var(--white);
+  --color-text-muted: var(--gray-200);
+  --color-border: var(--gray-700);
+  --color-track: var(--gray-700);
+  --color-locked-bg: var(--gray-700);
+  --color-on-locked: var(--white);
+  --color-focus: var(--white);
+  --color-node-current-bg: var(--crimson);
+  --color-node-current-ring: transparent;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
