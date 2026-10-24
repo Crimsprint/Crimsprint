@@ -1,12 +1,14 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { EXPIRED_MESSAGE } from '@/lib/session'
 import { configured, ensureUser, rpc, type Home } from '@/lib/supabase'
 
-export default function Landing() {
+function Landing() {
   const router = useRouter()
+  const expired = useSearchParams().get('expired') === '1'
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -43,8 +45,13 @@ export default function Landing() {
           Supabase isn’t configured yet. Copy <code>.env.example</code> to <code>.env.local</code>, fill in your project URL and publishable key, then restart the dev server.
         </p>
       )}
+      {expired && !error && <p role="status" className="rounded-xl border-2 border-border bg-surface p-4 font-semibold">{EXPIRED_MESSAGE}</p>}
       {error && <Alert title="Couldn’t start">{error}</Alert>}
       <p className="text-xs text-text-muted">Not affiliated with College Board, the SAT, or any university. SAT is a trademark of College Board.</p>
     </Screen>
   )
+}
+
+export default function Page() {
+  return <Suspense><Landing /></Suspense>
 }
