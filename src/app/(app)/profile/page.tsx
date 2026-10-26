@@ -5,7 +5,7 @@ import { MORE } from '@/components/AppShell'
 import { ACCESSORIES, AVATARS, Avatar, type Accessory } from '@/components/Avatar'
 import { Alert, Button, Screen } from '@/components/ui'
 import { ACHIEVEMENTS } from '@/lib/achievements'
-import { ensureUser, rpc, type Profile } from '@/lib/supabase'
+import { requireUser, rpc, type Profile } from '@/lib/supabase'
 
 const NAME = /^[A-Za-z0-9][A-Za-z0-9 ._-]{1,18}[A-Za-z0-9]$/ // same rule as the profiles.display_name check
 
@@ -17,7 +17,7 @@ export default function ProfilePage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    ensureUser().then(() => rpc<Profile>('get_profile')).then((x) => {
+    requireUser().then(() => rpc<Profile>('get_profile')).then((x) => {
       setP(x)
       setForm({ name: x.display_name ?? '', avatar: x.avatar, accessory: x.accessory ?? '' })
     }).catch((e) => setError(e.message))
@@ -65,10 +65,10 @@ export default function ProfilePage() {
         <h2 className="text-xl font-bold">Edit profile</h2>
         <label className="block">
           <span className="mb-1 block font-semibold">Display name</span>
-          <input value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={20} placeholder={p.handle}
+          <input value={form.name} onChange={(e) => set({ name: e.target.value })} maxLength={20} placeholder="e.g. Raccoon Fan"
             aria-invalid={!nameOk} aria-describedby="name-help" className="min-h-12 w-full rounded-xl border-2 border-border bg-surface px-4" />
           <span id="name-help" className="mt-1 block text-sm text-text-muted">
-            {nameOk ? 'Shown on leaderboards. Use a nickname, not your full name. Leave blank to stay anonymous.'
+            {nameOk ? 'Shown on leaderboards instead of your email. Use a nickname, not your full name. Leave blank for a random “Learner” name.'
               : '3–20 letters or numbers; spaces, dots, dashes and underscores allowed in the middle.'}
           </span>
         </label>

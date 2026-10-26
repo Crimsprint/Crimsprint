@@ -25,8 +25,8 @@ describe('profile', () => {
     await expect(as(u, () => rpc('set_profile', ['ab', 'slate', null]))).rejects.toThrow(/check/)
     await expect(as(u, () => rpc('set_profile', ['Sam', 'rainbow', null]))).rejects.toThrow(/check/)
     await expect(as(u, () => rpc('set_profile', ['Sam', 'slate', 'cap']))).rejects.toThrow(/not owned/)
-    await as(u, () => rpc('set_profile', ['', 'crimson', null])) // blank clears the name back to the anonymous handle
-    expect((await as(u, () => rpc('get_profile'))).display_name).toBeNull()
+    await as(u, () => rpc('set_profile', ['', 'crimson', null])) // blank goes back to a random default name
+    expect((await as(u, () => rpc('get_profile'))).display_name).toMatch(/^Learner \d{4}$/)
   })
 
   it('keeps the longest streak after the current one resets', async () => {

@@ -3,9 +3,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
-import { ensureUser, rpc } from '@/lib/supabase'
+import { saveDraft, type Draft } from '@/lib/onboardingDraft'
+import { rpc, supabase } from '@/lib/supabase'
 
-const STEPS = ['goal', 'date', 'scores', 'daily', 'diagnostic'] as const
+const STEPS = ['goal', 'date', 'scores', 'daily'] as const
 type Step = (typeof STEPS)[number]
 const SCORES = Array.from({ length: 121 }, (_, i) => 400 + i * 10)
 
@@ -47,23 +48,23 @@ function Onboarding() {
     date: noDate || date !== '',
     scores: target !== '',
     daily: daily !== null,
-    diagnostic: true,
   }
   // After a refresh the answers are gone: fall back to the first unanswered step.
   const step = STEPS.find((s, k) => k < STEPS.indexOf(asked) && !answered[s]) ?? asked
   const i = STEPS.indexOf(step)
   const canContinue = answered[step]
 
-  async function finish(diagnostic: boolean) {
+  async function finish() {
     setBusy(true)
+    const draft: Draft = {
+      p_goal: goal!, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
+      p_target: Number(target), p_daily_goal: daily!, p_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    }
     try {
-      await ensureUser()
-      await rpc('save_onboarding', {
-        p_goal: goal, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
-        p_target: Number(target), p_daily_goal: daily, p_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      })
-      if (diagnostic) router.push(`/session/${await rpc<string>('start_session', { p_mode: 'diagnostic' })}`)
-      else router.push('/learn')
+      // Reading the session makes no network request; guests reach Supabase only when they create their account.
+      const { data } = await supabase().auth.getSession()
+      if (data.session) { await rpc('save_onboarding', draft); router.push('/start') }
+      else { saveDraft(draft); router.push('/signup') }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
       setBusy(false)
@@ -118,17 +119,8 @@ function Onboarding() {
         }))} />
       </>}
 
-      {step === 'diagnostic' && <>
-        <h1 className="text-2xl font-bold">Find your starting point</h1>
-        <p>A 24-question diagnostic covers all 8 SAT domains and adapts as you go. It takes about 25 minutes, and you’ll see results at the end.</p>
-        {error && <Alert title="Couldn’t save">{error}</Alert>}
-        <Button onClick={() => finish(true)} disabled={busy}>Take the diagnostic</Button>
-        <Button variant="secondary" onClick={() => finish(false)} disabled={busy}>Skip and start learning</Button>
-      </>}
-
-      {step !== 'diagnostic' && (
-        <Button className="mt-auto" disabled={!canContinue} onClick={() => go(STEPS[i + 1])}>Continue</Button>
-      )}
+      {error && <Alert title="Couldn’t save">{error}</Alert>}
+      <Button className="mt-auto" disabled={!canContinue || busy} onClick={() => (i < STEPS.length - 1 ? go(STEPS[i + 1]) : finish())}>Continue</Button>
     </Screen>
   )
 }

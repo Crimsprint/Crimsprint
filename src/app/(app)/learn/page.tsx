@@ -9,7 +9,7 @@ import { Alert, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
 import { streakAtRisk } from '@/lib/dates'
 import { buildTrack } from '@/lib/path'
-import { ensureUser, rpc, supabase, type Home } from '@/lib/supabase'
+import { requireUser, rpc, supabase, type Home } from '@/lib/supabase'
 
 type Track = 'rw' | 'math'
 const TRACKS: { id: Track; name: string }[] = [{ id: 'rw', name: 'Reading and Writing' }, { id: 'math', name: 'Math' }]
@@ -30,7 +30,7 @@ export default function Learn() {
   })
 
   useEffect(() => {
-    ensureUser().then(() => rpc<Home>('get_home')).then((h) => {
+    requireUser().then(() => rpc<Home>('get_home')).then((h) => {
       if (!h.profile.onboarded) { router.replace('/onboarding'); return }
       setHome(h)
       const sb = supabase()

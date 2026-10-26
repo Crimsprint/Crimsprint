@@ -77,11 +77,13 @@ describe('achievements', () => {
 })
 
 describe('weekly leagues', () => {
-  it('places new learners in Pencil cohorts of at most 30, showing handles only', async () => {
+  it('places new learners in Pencil cohorts of at most 30, showing only name, avatar and points', async () => {
     const u = await fresh()
     const l = await as(u, () => rpc('get_league'))
     expect(l).toMatchObject({ tier: 1, tier_name: 'Pencil', promote: 7, demote: 0 })
-    expect(l.members.some((m: any) => m.me && m.handle.startsWith('learner-'))).toBe(true)
+    const me = l.members.find((m: any) => m.me)
+    expect(Object.keys(me).sort()).toEqual(['accessory', 'avatar', 'me', 'name', 'points'])
+    expect(me.name).toMatch(/^Learner \d{4}$/) // the default display name; never the email
     expect(JSON.stringify(l)).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-/) // no user ids leak
   })
 

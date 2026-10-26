@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Alert, Screen } from '@/components/ui'
 import { Bars, pct } from '@/components/Bars'
 import { domainRows, skillRow } from '@/lib/mastery'
-import { ensureUser, rpc, type Home } from '@/lib/supabase'
+import { requireUser, rpc, type Home } from '@/lib/supabase'
 
 type Progress = {
   target_score: number | null
@@ -23,7 +23,7 @@ export default function ProgressPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    ensureUser().then(() => Promise.all([rpc<Progress>('get_progress'), rpc<Home>('get_home')]))
+    requireUser().then(() => Promise.all([rpc<Progress>('get_progress'), rpc<Home>('get_home')]))
       .then(([p, h]) => setData({ p, h })).catch((e) => setError(e.message))
   }, [])
 

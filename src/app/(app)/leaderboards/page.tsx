@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { Alert, Button, Screen } from '@/components/ui'
 import { timeLeft, utcDate } from '@/lib/dates'
-import { ensureUser, rpc } from '@/lib/supabase'
+import { requireUser, rpc } from '@/lib/supabase'
 
-type Member = { handle: string; name: string; avatar: string; accessory: string | null; points: number; me: boolean }
+type Member = { name: string; avatar: string; accessory: string | null; points: number; me: boolean }
 type League = { opted_out: true } | {
   opted_out: false; tier: number; tier_name: string; week_end: string; promote: number; demote: number; members: Member[]
 }
@@ -29,7 +29,7 @@ export default function Leaderboards() {
   const [version, setVersion] = useState(0)
 
   useEffect(() => {
-    ensureUser().then(() => rpc<League>('get_league')).then(setLeague).catch((e) => setError(e.message))
+    requireUser().then(() => rpc<League>('get_league')).then(setLeague).catch((e) => setError(e.message))
   }, [version])
 
   async function optOut(v: boolean) {
@@ -64,7 +64,7 @@ export default function Leaderboards() {
       </p>
       <ol className="overflow-hidden rounded-2xl border-2 border-border bg-surface">
         {league.members.map((m, i) => (
-          <li key={m.handle}>
+          <li key={i}>
             {i === downFrom && i > 0 && <Divider up={false} />}
             <div className={`flex items-center gap-3 px-4 py-3 ${m.me ? 'bg-surface-muted font-semibold' : ''}`}>
               <span className="w-6 text-right tabular-nums">{i + 1}</span>

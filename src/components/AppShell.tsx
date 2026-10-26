@@ -34,7 +34,7 @@ export const MORE = [
   { href: '/mock', label: 'Mock test' },
   { href: '/progress', label: 'Progress' },
   { href: '/settings', label: 'Settings' },
-  { href: '/account', label: 'Save progress' },
+  { href: '/account', label: 'Account' },
   { href: '/help', label: 'Help' },
 ]
 // On phones Shop and the More pages live inside Profile, so Profile stays highlighted there.

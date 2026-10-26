@@ -1,7 +1,7 @@
 // Review screenshots of the running app (npm run dev) in headless Chrome, at desktop and phone sizes in light and dark.
 // Run: node scripts/screenshots.ts <outDir> <path[|css selector to click first[|name suffix]]>...
 //   e.g. node scripts/screenshots.ts screenshots/section-1 /learn "/learn|button[aria-controls=more-menu]|more" /progress
-// The spec @lesson starts the current path lesson, always picks choice A, and captures the question, the first correct and
+// The spec @verify captures the 6-digit code screen. The spec @lesson starts the current path lesson, always picks choice A, and captures the question, the first correct and
 // first incorrect feedback sheets, and the completion screen (each at every size and scheme).
 // One guest learner persists in <outDir>/../.profile and is onboarded (diagnostic skipped) on first run.
 import { spawn } from 'node:child_process'
@@ -92,6 +92,14 @@ try {
   const button = (text: string) => evaluate(`[...document.querySelectorAll('button')].find((b) => b.textContent.trim() === ${JSON.stringify(text)} && !b.disabled)?.click()`)
 
   for (const spec of specs) {
+    if (spec === '@verify') {
+      // The code screen shows the email waiting for verification (kept in this tab's sessionStorage).
+      await go('/signup')
+      await evaluate(`sessionStorage.setItem('verify-email', 'you@example.com'); sessionStorage.setItem('code-sent-at', String(Date.now()))`)
+      await go('/verify')
+      await captureAll('verify')
+      continue
+    }
     if (spec === '@lesson') {
       await go('/learn')
       await evaluate(`document.querySelector('[data-current]').click()`)
