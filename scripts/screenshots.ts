@@ -5,7 +5,7 @@
 // first incorrect feedback sheets, and the completion screen (each at every size and scheme).
 // One guest learner persists in <outDir>/../.profile and is onboarded (diagnostic skipped) on first run.
 import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import assert from 'node:assert'
 
@@ -62,6 +62,11 @@ const hasText = (text: string) => `document.body.innerText.includes(${JSON.strin
 try {
   await cdp('Page.enable')
   await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false })
+  // A protected preview: open the entry link (Vercel's bypass) once so the browser gets the bypass cookie.
+  if (process.env.ENTRY_URL_FILE) {
+    await cdp('Page.navigate', { url: readFileSync(process.env.ENTRY_URL_FILE, 'utf8').trim() })
+    await sleep(3000)
+  }
   await go('/learn')
   if ((await evaluate<string>('location.pathname')).startsWith('/onboarding')) {
     await until(hasText('first SAT'), 'onboarding'); await click('first time'); await click('Continue')
