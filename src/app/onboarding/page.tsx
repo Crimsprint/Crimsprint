@@ -4,7 +4,7 @@ import { Suspense, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
 import { saveDraft, type Draft } from '@/lib/onboardingDraft'
-import { rpc, supabase } from '@/lib/supabase'
+import { rpc, supabase, type Home } from '@/lib/supabase'
 
 const STEPS = ['goal', 'date', 'scores', 'daily'] as const
 type Step = (typeof STEPS)[number]
@@ -63,7 +63,12 @@ function Onboarding() {
     try {
       // Reading the session makes no network request; guests reach Supabase only when they create their account.
       const { data } = await supabase().auth.getSession()
-      if (data.session) { await rpc('save_onboarding', draft); router.push('/start') }
+      if (data.session) {
+        // Onboarding runs once per account; an onboarded learner who comes back here just returns to the path.
+        if ((await rpc<Home>('get_home')).profile.onboarded) return router.push('/learn')
+        await rpc('save_onboarding', draft)
+        router.push('/start')
+      }
       else { saveDraft(draft); router.push('/signup') }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))

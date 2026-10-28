@@ -94,7 +94,7 @@ describe('weekly leagues', () => {
     await db.exec(`update public.profiles set league_tier = 3 where id in (${users.map((u) => `'${u}'`).join(',')})`)
     for (const [i, u] of users.entries()) {
       await db.query(`select public.join_league($1, $2::timestamptz)`, [u, `${week}T12:00:00Z`])
-      await db.query(`insert into public.daily_points values ($1, $2::date, $3)`, [u, week, 100 - i]) // rank i+1
+      await db.query(`insert into public.league_points values ($1, $2::date, $3)`, [u, week, 100 - i]) // rank i+1
     }
     expect(new Set((await db.query<{ c: number }>(`select cohort c from public.league_members where week = $1 and tier = 3`, [week])).rows.map((r) => r.c)).size).toBe(1)
     const next = '2027-06-14T12:00:00Z'

@@ -5,7 +5,7 @@ import { Alert, Button, Screen } from '@/components/ui'
 import { DAILY_GOALS } from '@/lib/goals'
 import { requireUser, rpc, supabase } from '@/lib/supabase'
 
-type Profile = { goal: string | null; current_score: number | null; target_score: number | null; test_date: string | null; daily_goal: number; timezone: string }
+type Profile = { goal: string | null; current_score: number | null; target_score: number | null; test_date: string | null; daily_goal: number }
 
 export default function SettingsPage() {
   const [p, setP] = useState<Profile | null>(null)
@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    requireUser().then((u) => supabase().from('profiles').select('goal, current_score, target_score, test_date, daily_goal, timezone').eq('id', u.id).single())
+    requireUser().then((u) => supabase().from('profiles').select('goal, current_score, target_score, test_date, daily_goal').eq('id', u.id).single())
       .then(({ data, error }) => (error ? setError(error.message) : setP(data as Profile)))
       .catch((e) => setError(e.message))
   }, [])
@@ -27,10 +27,10 @@ export default function SettingsPage() {
     setBusy(true)
     setError('')
     try {
-      // save_onboarding writes every field, so the ones this page doesn't edit are sent back unchanged.
-      await rpc('save_onboarding', {
+      // update_settings writes every field, so the ones this page doesn't edit are sent back unchanged.
+      await rpc('update_settings', {
         p_goal: p.goal, p_test_date: p.test_date || null, p_current: p.current_score,
-        p_target: p.target_score, p_daily_goal: p.daily_goal, p_timezone: p.timezone,
+        p_target: p.target_score, p_daily_goal: p.daily_goal,
       })
       setSaved(true)
     } catch (e) { setError((e as Error).message) }

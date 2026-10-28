@@ -10,7 +10,7 @@ describe('route rules', () => {
 
   it('only returns to internal app pages after signing in', () => {
     expect(safeNext('/practice?x=1')).toBe('/practice?x=1')
-    for (const bad of [null, '', 'https://evil.example', '//evil.example', '/\\evil.example', 'javascript:alert(1)', '/learn\r\nX: y',
+    for (const bad of [null, '', 'https://evil.example', '//evil.example', '/\\evil.example', 'javascript:alert(1)', '/learn\r\nX: y', '/\t/evil.example', '/\n/evil.example', '/\\/evil.example',
       '/login', '/signup', '/verify', '/forgot']) expect(safeNext(bad), String(bad)).toBe('/learn')
   })
 })

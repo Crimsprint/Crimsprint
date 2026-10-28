@@ -7,7 +7,10 @@ export function isPublic(path: string) {
 
 /** Where to go after signing in: an internal path only (never another site), otherwise /learn. */
 export function safeNext(next: string | null | undefined) {
-  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\') || /[\r\n]/.test(next)) return '/learn'
+  // Browsers drop tabs and newlines and read "\" as "/", so "/\t/evil.example" is another site: refuse them, then make
+  // sure the path really resolves on this origin.
+  if (!next || !next.startsWith('/') || /[\u0000-\u001f\u007f\\]/.test(next)) return '/learn'
+  if (new URL(next, 'https://x.invalid').origin !== 'https://x.invalid') return '/learn'
   if (isPublic(next.split('?')[0]) && next !== '/onboarding') return '/learn' // never back into the sign-in screens
   return next
 }

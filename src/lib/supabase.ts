@@ -1,6 +1,7 @@
 'use client'
 import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { clearDraft } from './onboardingDraft'
 import { EXPIRED_MESSAGE, isAuthFailure, isDeadSession, mayRecover } from './session'
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -33,6 +34,7 @@ export async function requireUser(): Promise<User> {
 
 export async function signOut() {
   await supabase().auth.signOut()
+  clearDraft() // unfinished onboarding answers belong to whoever signs in next, not to this account
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- drop everything held in memory
   location.assign('/')
 }
