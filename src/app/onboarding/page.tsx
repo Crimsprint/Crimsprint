@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
-import { EXAM_OPTIONS, EXAM_PROFILES, scoreOptions, type Exam } from '@/lib/exams'
+import { EXAM_OPTIONS, EXAM_PROFILES, scoreOptions, scoreRangeNote, type Exam } from '@/lib/exams'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
 import { saveDraft, type Draft } from '@/lib/onboardingDraft'
 import { rpc, supabase, type Home } from '@/lib/supabase'
@@ -126,7 +126,7 @@ function Onboarding() {
             </select>
           </label>
         ))}
-        <p className="text-sm text-text-muted">The SAT is scored from 400 to 1600 in steps of 10.</p>
+        <p className="text-sm text-text-muted">{scoreRangeNote(exam ?? 'sat')}</p>
       </>}
 
       {step === 'daily' && <>

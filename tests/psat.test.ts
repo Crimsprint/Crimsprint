@@ -1,5 +1,5 @@
 import { beforeAll, expect, it } from 'vitest'
-import { scoreOptions } from '../src/lib/exams'
+import { scoreOptions, scoreRangeNote } from '../src/lib/exams'
 import { answer, as, db, keyFor, newUser, one, qlen, rpc, setup } from './harness'
 
 beforeAll(setup, 60_000)
@@ -11,6 +11,13 @@ const onboard = (u: string, target = 1200) =>
 
 it.each([['sat', 400, 1600], ['psat', 320, 1520]] as const)('offers %s scores in steps of 10', (exam, min, max) => {
   expect(scoreOptions(exam)).toEqual(Array.from({ length: (max - min) / 10 + 1 }, (_, i) => min + i * 10))
+})
+
+it.each([
+  ['sat', 'The SAT is scored from 400 to 1600 in steps of 10.'],
+  ['psat', 'The PSAT/NMSQT is scored from 320 to 1520 in steps of 10.'],
+] as const)('formats the onboarding score range for %s', (exam, note) => {
+  expect(scoreRangeNote(exam)).toBe(note)
 })
 
 it.each([[160, 160, 320, 48], [620, 500, 1120, 174], [760, 760, 1520, 228]])(
