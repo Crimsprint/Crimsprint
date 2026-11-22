@@ -2,7 +2,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { EXAM_PROFILES, type Exam } from '@/lib/exams'
+import { requireUser, supabase } from '@/lib/supabase'
+
+const ExamContext = createContext<{ exam: Exam; setExam: (exam: Exam) => void }>({ exam: 'sat', setExam: () => {} })
+export const useExam = () => useContext(ExamContext)
 
 const ICONS = {
   learn: 'M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',
@@ -72,9 +77,16 @@ function More({ active }: { active: boolean }) {
 /** Signed-in layout: sidebar on desktop (icons only on tablets), bottom tab bar on phones. */
 export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname()
+  const [exam, setExam] = useState<Exam>('sat')
+  useEffect(() => {
+    let active = true
+    requireUser().then((u) => supabase().from('profiles').select('exam_target').eq('id', u.id).single())
+      .then(({ data }) => { if (active && data) setExam(data.exam_target) }).catch(() => {})
+    return () => { active = false }
+  }, [])
   const inMore = MORE.some((m) => inside(path, m.href))
   return (
-    <>
+    <ExamContext.Provider value={{ exam, setExam }}>
       <nav aria-label="Main" className="fixed inset-y-0 left-0 z-20 hidden w-20 flex-col gap-1 border-r-2 border-border bg-sidebar px-2 py-6 md:flex lg:w-60 lg:px-4">
         <Link href="/learn" className="mb-6 flex items-center gap-3 rounded-xl px-2 md:justify-center lg:justify-start">
           <Image src="/mascot/raccoon-head.png" alt="Crimsprint raccoon mascot" width={44} height={44} priority className="size-11" />
@@ -113,7 +125,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </ul>
       </nav>
 
-      <div className="flex flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0 md:pl-20 lg:pl-60">{children}</div>
-    </>
+      <div className="flex flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0 md:pl-20 lg:pl-60">
+        {exam === 'psat' && <header className="px-4 pt-3 text-center text-xs font-semibold text-text-muted">{EXAM_PROFILES[exam].label}</header>}
+        {children}
+      </div>
+    </ExamContext.Provider>
   )
 }

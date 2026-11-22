@@ -38,7 +38,7 @@ export default function Learn() {
       const sb = supabase()
       return Promise.all([
         rpc<Quest[]>('get_quests').then(setQuests),
-        rpc<League>('get_league').then(setLeague),
+        rpc<League>('get_league_v2').then(setLeague),
         sb.from('mocks').select('result').eq('status', 'completed').order('completed_at', { ascending: false }).limit(1)
           .then(({ data }) => setMock(data?.[0]?.result?.total ?? null)),
         // A lesson started in the last day and left unfinished: the stats bar offers to resume it.
@@ -69,7 +69,7 @@ export default function Learn() {
     setBusy(true)
     setError('')
     try {
-      router.push(`/session/${await rpc<string>('start_session', args)}`)
+      router.push(`/session/${await rpc<string>('start_session_v2', args)}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
       setBusy(false)
