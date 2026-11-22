@@ -69,6 +69,7 @@ try {
   }
   await go('/learn')
   if ((await evaluate<string>('location.pathname')).startsWith('/onboarding')) {
+    await until(hasText('Which test are you preparing for?'), 'exam picker'); await click('SAT'); await click('Continue')
     await until(hasText('first SAT'), 'onboarding'); await click('first time'); await click('Continue')
     await until(hasText('When is your test'), 'date step'); await click('booked a date'); await click('Continue')
     await until(hasText('aiming for'), 'score step')

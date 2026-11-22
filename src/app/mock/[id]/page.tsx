@@ -7,6 +7,7 @@ import { MathTools } from '@/components/MathTools'
 import { ReportItem } from '@/components/ReportItem'
 import { Tex } from '@/components/Tex'
 import { Alert, Button, Check, Screen, XIcon } from '@/components/ui'
+import { PSAT_SCORE_NOTICE, type Exam } from '@/lib/exams'
 import { rpc } from '@/lib/supabase'
 
 type Choice = { id: string; text: string }
@@ -14,9 +15,9 @@ type Slot = { position: number; response: string | null; flagged: boolean; item:
 type Section = { estimate: number; low: number; high: number; correct: number; total: number; seconds_per_q: number }
 type Result = {
   sections: { rw: Section; math: Section }; total: { estimate: number; low: number; high: number }
-  domains: { domain: string; correct: number; total: number }[]; flagged_wrong: number
+  domains: { domain: string; correct: number; total: number }[]; flagged_wrong: number; selection_index?: number
 }
-type State = { status: 'active' | 'break' | 'completed'; stage: number; section: 'rw' | 'math'; module: number; deadline: string; server_now: string; result: Result | null; items: Slot[] | null }
+type State = { exam_target: Exam; status: 'active' | 'break' | 'completed'; stage: number; section: 'rw' | 'math'; module: number; deadline: string; server_now: string; result: Result | null; items: Slot[] | null }
 type Reviewed = { stage: number; position: number; response: string | null; correct: boolean; flagged: boolean
   item: { id: string; kind: string; passage: string | null; stem: string; choices: Choice[] | null; answer: string; explanation: string; rationales: Record<string, string>; skill: string } }
 
@@ -32,13 +33,13 @@ function MockRunner() {
   const reload = () => setVersion((v) => v + 1)
 
   useEffect(() => {
-    rpc<State>('mock_state', { p_mock: id }).then(setSt).catch((e) => setError(e.message))
+    rpc<State>('mock_state_v2', { p_mock: id }).then(setSt).catch((e) => setError(e.message))
   }, [id, version])
 
   if (error) return <Screen><Alert title="Something went wrong">{error}</Alert><Link href="/mock" className="underline">Back</Link></Screen>
   if (!st) return <Screen><p aria-live="polite">Loading…</p></Screen>
   if (st.status === 'break') return <Break id={id} onDone={reload} />
-  if (st.status === 'completed') return <Results id={id} r={st.result!} />
+  if (st.status === 'completed') return <Results id={id} r={st.result!} exam={st.exam_target} />
   return <Module key={st.stage} id={id} st={st} onSubmitted={reload} />
 }
 
@@ -70,7 +71,7 @@ function Module({ id, st, onSubmitted }: { id: string; st: State; onSubmitted: (
       const s = slots.find((x) => x.position === Number(pos))
       return rpc('mock_answer', { p_mock: id, p_position: Number(pos), p_response: s?.response ?? '' }).catch(() => {})
     }))
-    await rpc('mock_submit', { p_mock: id }).catch(() => {})  // the server also closes expired modules itself
+    await rpc('mock_submit_v2', { p_mock: id }).catch(() => {})  // the server also closes expired modules itself
     onSubmitted()
   }
   useEffect(() => { if (left <= 0) submit() })  // time's up: auto-submit, like Bluebook
@@ -180,7 +181,7 @@ function Break({ id, onDone }: { id: string; onDone: () => void }) {
   const resume = async () => {
     if (resumed.current) return
     resumed.current = true
-    await rpc('mock_resume', { p_mock: id })
+    await rpc('mock_resume_v2', { p_mock: id })
     onDone()
   }
   useEffect(() => {
@@ -198,26 +199,35 @@ function Break({ id, onDone }: { id: string; onDone: () => void }) {
   )
 }
 
-function Results({ id, r }: { id: string; r: Result }) {
+function Results({ id, r, exam }: { id: string; r: Result; exam: Exam }) {
+  const psat = exam === 'psat'
   const [review, setReview] = useState<Reviewed[] | null>(null)
   return (
     <Screen className="space-y-6">
       <Link href="/learn" className="underline">← Back to your path</Link>
-      <h1 className="text-2xl font-bold">Mock test results</h1>
+      <h1 className="text-2xl font-bold">{psat ? 'PSAT/NMSQT mock test results' : 'Mock test results'}</h1>
       <div className="rounded-2xl bg-primary p-6 text-on-primary">
         <p className="text-sm font-semibold uppercase tracking-wide">Estimated total</p>
-        <p className="text-5xl font-bold">{r.total.low}–{r.total.high}</p>
-        <p className="mt-2 text-sm">Estimate only, not an official College Board score.</p>
+        <p className="text-5xl font-bold">{psat ? r.total.estimate : `${r.total.low}–${r.total.high}`}</p>
+        {psat && <p className="text-sm">Estimated range {r.total.low}–{r.total.high}</p>}
+        <p className="mt-2 text-sm">{psat ? PSAT_SCORE_NOTICE : 'Estimate only, not an official College Board score.'}</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {(['rw', 'math'] as const).map((k) => (
           <div key={k} className="rounded-xl border-2 border-border bg-surface p-4">
-            <p className="text-sm text-text-muted">{NAMES[k]}</p>
-            <p className="text-2xl font-bold">{r.sections[k].low}–{r.sections[k].high}</p>
+            <p className="text-sm text-text-muted">{psat ? `Estimated ${NAMES[k]}` : NAMES[k]}</p>
+            <p className="text-2xl font-bold">{psat ? r.sections[k].estimate : `${r.sections[k].low}–${r.sections[k].high}`}</p>
+            {psat && <p className="text-sm text-text-muted">Range {r.sections[k].low}–{r.sections[k].high}</p>}
             <p className="text-sm text-text-muted">{r.sections[k].correct}/{r.sections[k].total} correct · {r.sections[k].seconds_per_q}s per question</p>
           </div>
         ))}
       </div>
+      {psat && (
+        <div className="rounded-xl border-2 border-border bg-surface p-4">
+          <p className="text-sm text-text-muted">Estimated Selection Index</p>
+          <p className="text-2xl font-bold">{r.selection_index}</p>
+        </div>
+      )}
       <Bars title="Accuracy by domain" rows={r.domains.map((d) => ({ label: d.domain, value: d.total ? d.correct / d.total : 0 }))} />
       {r.flagged_wrong > 0 && <p>{r.flagged_wrong} question{r.flagged_wrong > 1 ? 's' : ''} you marked for review {r.flagged_wrong > 1 ? 'were' : 'was'} wrong. Your instinct to double-check was right.</p>}
       <p className="text-text-muted">Every missed question was added to your review queue.</p>

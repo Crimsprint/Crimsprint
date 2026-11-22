@@ -14,7 +14,7 @@ export async function afterSignIn(next?: string | null): Promise<string> {
     return safeNext(next)
   }
   if (!draft) return '/onboarding'
-  await rpc('save_onboarding', draft) // the profile row already exists: the auth trigger made it with the account
+  await rpc('save_onboarding_v2', draft) // the profile row already exists: the auth trigger made it with the account
   clearDraft()
   return '/start'
 }

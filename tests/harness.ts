@@ -5,7 +5,11 @@ import { readdirSync, readFileSync } from 'node:fs'
 const sqlFile = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8')
 export let db: PGlite
 
-export async function setup() {
+export const applyMigration = (file: string) => db.exec(sqlFile(`supabase/migrations/${file}`))
+
+export const setup = () => setupThrough(Infinity)
+
+export async function setupThrough(through: number) {
   db = new PGlite()
   await db.exec(`
     create role anon nologin; create role authenticated nologin;
@@ -17,7 +21,9 @@ export async function setup() {
     -- Supabase's default: API roles can execute every new function in public unless revoked.
     alter default privileges in schema public grant execute on functions to anon, authenticated;
   `)
-  for (const f of readdirSync(new URL('../supabase/migrations', import.meta.url)).sort()) await db.exec(sqlFile(`supabase/migrations/${f}`))
+  for (const file of readdirSync(new URL('../supabase/migrations', import.meta.url)).sort()) {
+    if (Number(file.split('_', 1)[0]) <= through) await applyMigration(file)
+  }
   await db.exec(sqlFile('supabase/seed.sql'))
   // Supabase's default privileges: table access for API roles, filtered by RLS.
   await db.exec('grant all on all tables in schema public to anon, authenticated;')

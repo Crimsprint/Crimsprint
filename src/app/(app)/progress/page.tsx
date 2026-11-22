@@ -3,15 +3,17 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Screen } from '@/components/ui'
 import { Bars, pct } from '@/components/Bars'
+import { EXAM_PROFILES, type Exam } from '@/lib/exams'
 import { domainRows, skillRow } from '@/lib/mastery'
 import { requireUser, rpc, type Home } from '@/lib/supabase'
 
 type Progress = {
+  exam_target: Exam
   target_score: number | null
   days_to_test: number | null
   sections: Partial<Record<'rw' | 'math', { answered: number; accuracy: number; median_seconds: number }>> | null
   weeks: { week: string; answered: number; accuracy: number }[] | null
-  mocks: { id: string; completed_at: string; total: { estimate: number; low: number; high: number } }[] | null
+  mocks: { exam_target: Exam; id: string; completed_at: string; total: { estimate: number; low: number; high: number } }[] | null
   achievements: { code: string; earned_at: string }[] | null
 }
 // SAT pace per question (docs/sat-spec.md §2).
@@ -23,18 +25,21 @@ export default function ProgressPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    requireUser().then(() => Promise.all([rpc<Progress>('get_progress'), rpc<Home>('get_home')]))
+    requireUser().then(() => Promise.all([rpc<Progress>('get_progress_v2'), rpc<Home>('get_home')]))
       .then(([p, h]) => setData({ p, h })).catch((e) => setError(e.message))
   }, [])
 
   if (error) return <Screen wide><Alert title="Couldn’t load progress">{error}</Alert></Screen>
   if (!data) return <Screen wide><p aria-live="polite">Loading…</p></Screen>
   const { p, h } = data
-  const latest = p.mocks?.at(-1)?.total
+  const exam = p.exam_target ?? 'sat'
+  const { label, max } = EXAM_PROFILES[exam]
+  const mocks = p.mocks?.filter((m) => (m.exam_target ?? 'sat') === exam)
+  const latest = mocks?.at(-1)?.total
 
   return (
     <Screen wide className="space-y-8">
-      <h1 className="text-2xl font-bold">Your progress</h1>
+      <h1 className="text-2xl font-bold">{exam === 'psat' ? 'Your PSAT/NMSQT progress' : 'Your progress'}</h1>
 
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border-2 border-border bg-surface p-4">
@@ -57,7 +62,7 @@ export default function ProgressPage() {
               <p className="font-semibold">{NAMES[k]}</p>
               {s ? (
                 <p className="text-text-muted">{s.answered} answered · {pct(s.accuracy)} correct · {Math.round(s.median_seconds)}s median per question
-                  (SAT pace {Math.round(PACE[k])}s{s.median_seconds > PACE[k] ? ', so speed up a little' : ''})</p>
+                  ({label} pace {Math.round(PACE[k])}s{s.median_seconds > PACE[k] ? ', so speed up a little' : ''})</p>
               ) : <p className="text-text-muted">No questions yet.</p>}
             </div>
           )
@@ -72,9 +77,9 @@ export default function ProgressPage() {
 
       {p.weeks && <Bars title="Weekly accuracy" rows={p.weeks.map((w) => ({ label: `Week of ${w.week} (${w.answered} Qs)`, value: w.accuracy }))} />}
 
-      {p.mocks && (
-        <Bars title="Mock test estimates (out of 1600)" max={1600} fmt={(v) => String(v)}
-          rows={p.mocks.map((m) => ({ label: new Date(m.completed_at).toLocaleDateString(), value: m.total.estimate }))} />
+      {!!mocks?.length && (
+        <Bars title={`Mock test estimates (out of ${max})`} max={max} fmt={(v) => String(v)}
+          rows={mocks.map((m) => ({ label: new Date(m.completed_at).toLocaleDateString(), value: m.total.estimate }))} />
       )}
 
       <p className="text-text-muted">Achievements are on your <Link href="/profile" className="font-semibold text-text underline">profile</Link>.</p>

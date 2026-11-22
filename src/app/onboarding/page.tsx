@@ -2,13 +2,13 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useId, useState, type ReactNode } from 'react'
 import { Alert, Button, ProgressBar, Screen } from '@/components/ui'
+import { EXAM_OPTIONS, EXAM_PROFILES, scoreOptions, scoreRangeNote, type Exam } from '@/lib/exams'
 import { DAILY_GOALS as GOALS } from '@/lib/goals'
 import { saveDraft, type Draft } from '@/lib/onboardingDraft'
 import { rpc, supabase, type Home } from '@/lib/supabase'
 
-const STEPS = ['goal', 'date', 'scores', 'daily'] as const
+const STEPS = ['exam', 'goal', 'date', 'scores', 'daily'] as const
 type Step = (typeof STEPS)[number]
-const SCORES = Array.from({ length: 121 }, (_, i) => 400 + i * 10)
 
 function Options<T extends string | number>({ name, legend, value, onChange, options }: {
   name: string; legend: string; value: T | null; onChange: (v: T) => void; options: { value: T; label: ReactNode }[]
@@ -32,8 +32,10 @@ function Options<T extends string | number>({ name, legend, value, onChange, opt
 function Onboarding() {
   const router = useRouter()
   const params = useSearchParams()
-  const asked = (STEPS.includes(params.get('step') as Step) ? params.get('step') : 'goal') as Step
+  const asked = (STEPS.includes(params.get('step') as Step) ? params.get('step') : 'exam') as Step
 
+  const [exam, setExam] = useState<Exam | null>(null)
+  const examLabel = EXAM_PROFILES[exam ?? 'sat'].label
   const [goal, setGoal] = useState<'first' | 'retake' | null>(null)
   const [date, setDate] = useState('')
   const [noDate, setNoDate] = useState(false)
@@ -44,6 +46,7 @@ function Onboarding() {
   const [error, setError] = useState('')
 
   const answered: Record<Step, boolean> = {
+    exam: exam !== null,
     goal: goal !== null,
     date: noDate || date !== '',
     scores: target !== '',
@@ -57,7 +60,7 @@ function Onboarding() {
   async function finish() {
     setBusy(true)
     const draft: Draft = {
-      p_goal: goal!, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
+      p_exam_target: exam!, p_goal: goal!, p_test_date: noDate ? null : date, p_current: current ? Number(current) : null,
       p_target: Number(target), p_daily_goal: daily!, p_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }
     try {
@@ -66,7 +69,7 @@ function Onboarding() {
       if (data.session) {
         // Onboarding runs once per account; an onboarded learner who comes back here just returns to the path.
         if ((await rpc<Home>('get_home')).profile.onboarded) return router.push('/learn')
-        await rpc('save_onboarding', draft)
+        await rpc('save_onboarding_v2', draft)
         router.push('/start')
       }
       else { saveDraft(draft); router.push('/signup') }
@@ -85,9 +88,18 @@ function Onboarding() {
         <ProgressBar value={i + 1} max={STEPS.length} label="Onboarding progress" />
       </div>
 
+      {step === 'exam' && <>
+        <h1 className="text-2xl font-bold">Which test are you preparing for?</h1>
+        <Options name="exam" legend="Which test are you preparing for?" value={exam} options={EXAM_OPTIONS}
+          onChange={(value) => {
+            if (value !== exam) { setCurrent(''); setTarget('') }
+            setExam(value)
+          }} />
+      </>}
+
       {step === 'goal' && <>
-        <h1 className="text-2xl font-bold">Is this your first SAT?</h1>
-        <Options name="goal" legend="Is this your first SAT?" value={goal} onChange={setGoal} options={[{ value: 'first', label: 'Yes, it’s my first time' }, { value: 'retake', label: 'No, I’m retaking it' }]} />
+        <h1 className="text-2xl font-bold">Is this your first {examLabel}?</h1>
+        <Options name="goal" legend={`Is this your first ${examLabel}?`} value={goal} onChange={setGoal} options={[{ value: 'first', label: 'Yes, it’s my first time' }, { value: 'retake', label: 'No, I’m retaking it' }]} />
       </>}
 
       {step === 'date' && <>
@@ -110,11 +122,11 @@ function Onboarding() {
             <span className="mb-2 block text-text-muted">{label as string}</span>
             <select value={v as string} onChange={(e) => (set as (s: string) => void)(e.target.value)} className="min-h-12 w-full rounded-xl border-2 border-border bg-surface px-4">
               <option value="">Select…</option>
-              {SCORES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {scoreOptions(exam ?? 'sat').map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </label>
         ))}
-        <p className="text-sm text-text-muted">The SAT is scored from 400 to 1600 in steps of 10.</p>
+        <p className="text-sm text-text-muted">{scoreRangeNote(exam ?? 'sat')}</p>
       </>}
 
       {step === 'daily' && <>

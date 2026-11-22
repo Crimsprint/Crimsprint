@@ -23,6 +23,7 @@ export default function Landing() {
         <li>• A 25-minute diagnostic finds your weak skills</li>
         <li>• 8-question lessons on one skill at a time</li>
         <li>• Every answer explained, including why the wrong ones are wrong</li>
+        <li>• PSAT/NMSQT practice is also available</li>
       </ul>
       {configured ? (
         <div className="space-y-3">
