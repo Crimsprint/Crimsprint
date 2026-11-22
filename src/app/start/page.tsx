@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import { Mascot } from '@/components/Mascot'
 import { Alert, Button, Screen } from '@/components/ui'
 import { rpc } from '@/lib/supabase'
@@ -9,6 +9,8 @@ import { rpc } from '@/lib/supabase'
 export default function StartPage() {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
+  // Next keeps this page alive while a session runs: clear the busy flag when it's hidden, so Start works on return.
+  useLayoutEffect(() => () => setBusy(false), [])
   const [error, setError] = useState('')
 
   async function diagnostic() {

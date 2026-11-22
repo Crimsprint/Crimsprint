@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react'
 import { Mascot } from '@/components/Mascot'
 import { Path, type StartArgs } from '@/components/Path'
 import { QuestList, type Quest } from '@/components/Quests'
@@ -20,6 +20,8 @@ export default function Learn() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
+  // Next keeps this page alive while a session runs: clear the busy flag when it's hidden, so Start works on return.
+  useLayoutEffect(() => () => setBusy(false), [])
   const [quests, setQuests] = useState<Quest[]>([])
   const [league, setLeague] = useState<League | null>(null)
   const [mock, setMock] = useState<LatestMock>(null)

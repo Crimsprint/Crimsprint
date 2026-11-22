@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useLayoutEffect } from 'react'
 import { Alert, Button, Screen } from '@/components/ui'
 import { requireUser, rpc } from '@/lib/supabase'
 
@@ -24,6 +24,8 @@ export default function PracticePage() {
   const [pass, setPass] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // Next keeps this page alive while a session runs: clear the busy flag when it's hidden, so Start works on return.
+  useLayoutEffect(() => () => setBusy(false), [])
 
   useEffect(() => {
     requireUser().then(() => rpc<Practice>('get_practice')).then(setP).catch((e) => setError(e.message))
