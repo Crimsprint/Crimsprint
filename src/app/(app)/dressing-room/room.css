@@ -1,0 +1,184 @@
+.dressing-room {
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  padding-top: 1rem;
+}
+
+.dressing-room-heading, .dressing-room-catalog-head, .dressing-room-preview-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.dressing-room-heading { margin-bottom: 1.5rem; }
+.dressing-room-heading h1 {
+  font: 700 clamp(2.1rem, 5.3vw, 4.2rem)/.98 Georgia, 'Times New Roman', serif;
+  letter-spacing: -.055em;
+  margin-block: .45rem .65rem;
+}
+.dressing-room-back { color: var(--wardrobe-muted); font-size: .9rem; }
+.dressing-room-back { display: inline-flex; align-items: center; min-height: 2rem; font-weight: 650; }
+.dressing-room-back:hover { text-decoration: underline; }
+.dressing-room-balance { align-self: center; }
+.dressing-room-coin { display: inline-flex; align-items: center; gap: .29rem; white-space: nowrap; font-weight: 690; }
+.dressing-room-coin > span { display: grid; place-items: center; width: 1.04rem; height: 1.04rem; border-radius: 50%; background: var(--wardrobe-coin); color: var(--wardrobe-coin-text); font-size: .7rem; }
+.dressing-room-balance .dressing-room-coin { border-radius: 999px; padding: .58rem .82rem; font-size: .88rem; background: var(--wardrobe-coin); color: var(--wardrobe-coin-text); }
+.dressing-room-balance .dressing-room-coin > span { background: var(--wardrobe-coin-text); color: var(--wardrobe-coin); }
+
+.dressing-room-layout { display: grid; align-items: start; gap: 1rem; }
+.dressing-room-preview, .dressing-room-catalog {
+  min-width: 0;
+  border: 1px solid var(--wardrobe-edge);
+  border-radius: 1.5rem;
+  background: var(--wardrobe-panel);
+  padding: clamp(.8rem, 2vw, 1.35rem);
+}
+.dressing-room-preview-heading, .dressing-room-catalog-head { align-items: center; }
+.dressing-room-preview-heading { margin-bottom: .7rem; }
+.dressing-room-preview-heading h2, .dressing-room-catalog-head h2 { font: 700 clamp(1.32rem, 2.4vw, 1.7rem)/1.1 Georgia, 'Times New Roman', serif; letter-spacing: -.04em; }
+.dressing-room-preview-heading > span {
+  border: 1px solid var(--wardrobe-edge);
+  border-radius: 999px;
+  padding: .25rem .58rem;
+  color: var(--wardrobe-muted);
+  font-size: .7rem;
+  font-weight: 690;
+  white-space: nowrap;
+}
+.dressing-room-stage {
+  display: grid;
+  place-items: center;
+  border-radius: 1.05rem;
+  background: var(--wardrobe-art);
+  padding: .4rem;
+}
+.dressing-room-stage > svg {
+  width: min(100%, 360px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: .8rem;
+}
+.dressing-room-preview-detail {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: .45rem;
+  min-height: 2.6rem;
+  color: var(--wardrobe-muted);
+  font-size: .81rem;
+  text-align: center;
+}
+.dressing-room-actions { display: flex; gap: .5rem; }
+.dressing-room-primary, .dressing-room-secondary, .dressing-room-tools button {
+  min-height: 2.75rem;
+  border-radius: .68rem;
+  font-size: .9rem;
+  font-weight: 700;
+}
+.dressing-room-primary, .dressing-room-secondary { flex: 1 1 auto; padding-inline: .6rem; }
+.dressing-room-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.dressing-room-secondary { border: 1px solid var(--wardrobe-edge); }
+.dressing-room-primary:disabled, .dressing-room-secondary:disabled { background: var(--wardrobe-art); color: var(--wardrobe-muted); border-color: transparent; }
+.dressing-room-tools { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-top: .5rem; }
+.dressing-room-tools button { display: flex; align-items: center; justify-content: center; gap: .36rem; border: 1px solid var(--wardrobe-edge); }
+.dressing-room-tools svg { width: 1rem; height: 1rem; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dressing-room-tools button:disabled { color: var(--wardrobe-muted); opacity: .68; }
+.dressing-room-status { margin-top: .6rem; color: var(--wardrobe-muted); font-size: .78rem; text-align: center; }
+.dressing-room button:disabled { cursor: not-allowed; }
+
+.dressing-room-filters { display: flex; flex-wrap: wrap; justify-content: end; gap: .4rem; }
+.dressing-room-filters select {
+  min-height: 2.5rem;
+  max-width: 100%;
+  border: 1px solid var(--wardrobe-edge);
+  border-radius: .6rem;
+  background: var(--wardrobe-card);
+  padding: .25rem .34rem;
+  font-size: .79rem;
+  font-weight: 620;
+}
+.dressing-room-categories { display: flex; flex-wrap: wrap; gap: .35rem; margin-block: .9rem; padding-bottom: .9rem; border-bottom: 1px solid var(--wardrobe-edge); }
+.dressing-room-categories button {
+  min-height: 2.75rem;
+  border-radius: .55rem;
+  border: 1px solid var(--wardrobe-edge);
+  background: var(--wardrobe-card);
+  padding-inline: .68rem;
+  font-size: .79rem;
+  font-weight: 650;
+}
+.dressing-room-categories button[aria-selected="true"] { background: var(--wardrobe-active); border-color: var(--wardrobe-selection); }
+.dressing-room-categories button:hover:not(:disabled), .dressing-room-tools button:hover:not(:disabled) { border-color: var(--wardrobe-selection); }
+.dressing-room-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+.dressing-room-item {
+  display: grid;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  grid-template-rows: auto minmax(2em, 1fr) auto;
+  border: 1px solid var(--wardrobe-edge);
+  border-radius: .85rem;
+  background: var(--wardrobe-card);
+  padding: .3rem;
+  text-align: left;
+  transition: border-color 140ms, background 140ms;
+}
+.dressing-room-item:hover, .dressing-room-item[aria-pressed="true"] { border-color: var(--wardrobe-selection); }
+.dressing-room-item[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--wardrobe-selection); background: var(--wardrobe-active); }
+.dressing-room-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  height: clamp(5.6rem, 10vw, 8rem);
+  border-radius: .55rem;
+  background: var(--wardrobe-art);
+}
+.dressing-room-art svg { padding: .93rem .48rem .21rem; }
+.dressing-room-rarity {
+  position: absolute;
+  top: .25rem;
+  left: .25rem;
+  border-radius: 999px;
+  padding: .16rem .39rem;
+  background: var(--wardrobe-common-background);
+  color: var(--wardrobe-common-color);
+  font-size: .62rem;
+  line-height: 1.15;
+  font-weight: 740;
+  text-transform: capitalize;
+}
+.dressing-room-rarity[data-rarity="rare"] { background: var(--wardrobe-rare-background); color: var(--wardrobe-rare-color); }
+.dressing-room-rarity[data-rarity="epic"] { background: var(--wardrobe-epic-background); color: var(--wardrobe-epic-color); }
+.dressing-room-rarity[data-rarity="legendary"] { background: var(--wardrobe-coin); color: var(--wardrobe-coin-text); }
+.dressing-room-item-name { padding: .42rem .29rem 0; font-size: .78rem; line-height: 1.15; font-weight: 720; overflow-wrap: anywhere; }
+.dressing-room-item-meta { display: flex; align-items: center; gap: .26rem; padding: .34rem .29rem .26rem; font-size: .7rem; color: var(--wardrobe-muted); line-height: 1.12; }
+.dressing-room-empty { color: var(--wardrobe-muted); padding-block: .55rem; }
+.dressing-room-remove { min-height: 2.75rem; padding: .3rem .7rem; margin-bottom: .62rem; border: 1px solid var(--wardrobe-edge); border-radius: .6rem; font-size: .81rem; font-weight: 650; }
+.dressing-room-tint { display: flex; align-items: center; flex-wrap: wrap; gap: .42rem; margin-bottom: .84rem; }
+.dressing-room-tint label { font-size: .82rem; font-weight: 650; }
+.dressing-room-tint button, .dressing-room-tint input { width: 2rem; height: 2rem; border: 1px solid var(--wardrobe-edge); border-radius: .45rem; }
+.dressing-room-tint button[aria-pressed="true"] { outline: 2px solid var(--wardrobe-selection); outline-offset: 2px; }
+
+@media (min-width: 54rem) {
+  .dressing-room-layout { grid-template-columns: minmax(0, 1fr) minmax(17rem, .76fr); }
+  .dressing-room-preview { grid-area: 1 / 2; position: sticky; top: 1rem; }
+  .dressing-room-catalog { grid-area: 1 / 1; }
+  .dressing-room-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 76rem) {
+  .dressing-room-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 34rem) {
+  .dressing-room { padding-top: .2rem; }
+  .dressing-room-heading { margin-bottom: .9rem; }
+  .dressing-room-balance .dressing-room-coin { font-size: .75rem; padding: .42rem .54rem; }
+  .dressing-room-stage > svg { width: min(100%, 15.5rem); }
+  .dressing-room-categories button { padding-inline: .55rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dressing-room-item { transition: none; }
+}

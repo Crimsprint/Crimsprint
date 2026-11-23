@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-/* Token file: the only place colors are defined. Harvard palette (colors only, no affiliation implied)
-   plus one non-Harvard green for success. Components use the semantic tokens below via Tailwind classes. */
+/* UI color tokens. The core palette uses Harvard colors (no affiliation implied) plus a green for success. */
 :root {
   --crimson: #A51C30;
   --ink: #1E1E1E;
@@ -14,6 +13,23 @@
   --slate: #8996A0;
   --chocolate: #422E1C;
   --green: #1E7B4A;
+
+  /* Dressing room surfaces and rarity labels. */
+  --wardrobe-panel: light-dark(#fffaf3, #25222a);
+  --wardrobe-card: light-dark(#fffdfa, #302a34);
+  --wardrobe-edge: light-dark(#e0d5ca, #51444e);
+  --wardrobe-muted: light-dark(#665851, #cebdc5);
+  --wardrobe-selection: light-dark(#933c54, #f1aabd);
+  --wardrobe-active: light-dark(#f8e0e3, #563446);
+  --wardrobe-art: light-dark(#f0e4d5, #443543);
+  --wardrobe-coin: light-dark(#f7e5ba, #5c442e);
+  --wardrobe-coin-text: light-dark(#65441d, #ffdea3);
+  --wardrobe-common-background: light-dark(#fef6e5, #392c28);
+  --wardrobe-common-color: light-dark(#54453c, #f4dac6);
+  --wardrobe-rare-background: light-dark(#d7e8df, #253d36);
+  --wardrobe-rare-color: light-dark(#2b513d, #c0ecd6);
+  --wardrobe-epic-background: light-dark(#eddef4, #4b335b);
+  --wardrobe-epic-color: light-dark(#633c73, #f1ceed);
   color-scheme: light;
 }
 
