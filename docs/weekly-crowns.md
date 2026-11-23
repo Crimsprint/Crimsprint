@@ -6,7 +6,7 @@ The crown is visible from the cutoff for seven days. Leaving leagues hides the a
 
 ## Storage and rollout
 
-Apply [0014_weekly_league_crowns.sql](../supabase/migrations/0014_weekly_league_crowns.sql) after 0013 and before deploying the crown client. The two thresholds are in the single row in `league_crown_rules`. The first eligible period is the first full UTC league week after installation, because older totals lack the exact times and opt-out history needed to judge ties fairly.
+Apply [0014_weekly_league_crowns.sql](../supabase/migrations/0014_weekly_league_crowns.sql) after 0013, then apply [0015_league_crown_banner_rules.sql](../supabase/migrations/0015_league_crown_banner_rules.sql) before deploying the crown client. The two thresholds are in the single row in `league_crown_rules`. The first eligible period is the first full UTC league week after installation, because older totals lack the exact times and opt-out history needed to judge ties fairly.
 
 Crown reads use the existing UTC league totals and cohort memberships. The migration adds a timestamp when a score changes and records opt-out transitions. It does not schedule a job or store award rows. Crown history is derived from retained league data, so historical results can change if accounts or scores are deleted. Tuning the rules applies to all eligible weeks.
 

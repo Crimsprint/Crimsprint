@@ -6,15 +6,18 @@ import { Avatar } from '@/components/Avatar'
 import { CrownBadge, CrownIcon, useCrownTimeLeft } from '@/components/Crown'
 import { Alert, Button, Screen } from '@/components/ui'
 import type { AvatarSource } from '@/lib/avatar'
+import { crownBanner, type CrownRules } from '@/lib/crownBanner'
 import { EXAM_PROFILES, type Exam } from '@/lib/exams'
 import { timeLeft, utcDate } from '@/lib/dates'
 import { requireUser, rpc } from '@/lib/supabase'
 
 type Champion = { profile_key: string; name: string; crown_expires_at: string }
 type Member = AvatarSource & { profile_key: string; exam_target: Exam; name: string; points: number; me: boolean }
-type League = { opted_out: true } | {
-  opted_out: false; tier: number; tier_name: string; week_end: string; promote: number; demote: number; members: Member[]; previous_champion: Champion | null
+type RankedLeague = {
+  opted_out: false; tier: number; tier_name: string; week_end: string; promote: number; demote: number; members: Member[]
+  previous_champion: Champion | null; crown_rules: CrownRules
 }
+type League = { opted_out: true } | RankedLeague
 
 // Visual only: each row also says its zone in screen-reader text.
 function Divider({ up }: { up: boolean }) {
@@ -29,19 +32,14 @@ function Divider({ up }: { up: boolean }) {
   )
 }
 
-function CrownRace({ members, previous }: { members: Member[]; previous: Champion | null }) {
+function CrownRace({ members, previous_champion: previous, week_end, crown_rules }: RankedLeague) {
   const left = useCrownTimeLeft(previous?.crown_expires_at)
-  const myRank = members.findIndex((member) => member.me)
-  const gap = myRank < 0 ? null : members[0].points - members[myRank].points
+  const { title, detail } = crownBanner(week_end, crown_rules, members)
   return <section aria-labelledby="crown-race" className="flex items-start gap-3 rounded-2xl border-2 border-border bg-surface p-4">
     <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-on-primary"><CrownIcon className="size-5" /></span>
     <div>
-      <h2 id="crown-race" className="font-bold">Finish #1 this week to earn the crown</h2>
-      {gap !== null && <p className="text-sm text-text-muted">
-        {myRank === 0 ? 'You’re #1 · 0 points behind'
-          : gap === 0 ? 'Tied on points · 1 more point to take the lead'
-            : `${gap} ${gap === 1 ? 'point' : 'points'} behind #1`}
-      </p>}
+      <h2 id="crown-race" className="font-bold">{title}</h2>
+      {detail && <p className="text-sm text-text-muted">{detail}</p>}
       {previous && left && !members.some((member) => member.profile_key === previous.profile_key) && (
         <p className="mt-2 flex flex-wrap items-center gap-x-2 text-sm">
           <CrownIcon className="size-4" /> Last week’s champion
@@ -59,7 +57,7 @@ export default function Leaderboards() {
   const refreshAvatar = useRefreshAvatar()
 
   useEffect(() => {
-    requireUser().then(() => rpc<League>('get_league_v3')).then(setLeague).catch((e) => setError(e.message))
+    requireUser().then(() => rpc<League>('get_league_v3_with_crown_rules')).then(setLeague).catch((e) => setError(e.message))
   }, [version])
 
   async function optOut(v: boolean) {
@@ -95,7 +93,7 @@ export default function Leaderboards() {
       <p className="text-text-muted">
         Ranked by points this week.{league.promote > 0 && ` Top ${league.promote} move up.`}{league.demote > 0 && ` Bottom ${league.demote} move down.`}
       </p>
-      <CrownRace members={league.members} previous={league.previous_champion} />
+      <CrownRace {...league} />
       <ol className="overflow-hidden rounded-2xl border-2 border-border bg-surface">
         {league.members.map((m, i) => (
           <li key={m.profile_key}>

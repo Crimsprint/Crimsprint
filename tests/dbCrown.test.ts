@@ -15,6 +15,7 @@ beforeAll(async () => {
   await newUser(optedOutAtInstall)
   await as(optedOutAtInstall, () => rpc('set_leagues_opt_out', [true]))
   await applyMigration('0014_weekly_league_crowns.sql')
+  await applyMigration('0015_league_crown_banner_rules.sql')
   const dates = await one<{ week: string; last: string; earlier: string }>(
     'select public.week_start()::text as week, (public.week_start()-7)::text as last, (public.week_start()-14)::text as earlier')
   week = dates.week
@@ -153,4 +154,27 @@ it('shows a promoted previous champion and exposes only an allowlisted profile t
   await as(winner, () => rpc('set_leagues_opt_out', [true]))
   expect(await as(viewer, () => rpc('get_public_league_profile', [handle]))).toBeNull()
   expect((await as(viewer, () => rpc('get_league_v3'))).previous_champion).toBeNull()
+})
+
+
+it('provides the configured banner rules through a new authenticated wrapper around the old leaderboard', async () => {
+  const viewer = await player(week, cohort++, 11)
+  await db.exec('update public.league_crown_rules set min_active_members = 4, min_winner_points = 60')
+  try {
+    await as(viewer, async () => {
+      const before = await rpc('get_league_v3')
+      expect(before).not.toHaveProperty('crown_rules')
+      expect(await rpc('get_league_v3_with_crown_rules')).toEqual({
+        ...before, crown_rules: { first_week: expect.any(String), min_active_members: 4, min_winner_points: 60 },
+      })
+      await rpc('set_leagues_opt_out', [true])
+      expect(await rpc('get_league_v3_with_crown_rules')).toEqual({ opted_out: true })
+    })
+  } finally {
+    await db.exec('update public.league_crown_rules set min_active_members = 3, min_winner_points = 50')
+  }
+  await db.exec("set role anon; select set_config('request.jwt.claim.sub', '', false);")
+  try {
+    await expect(rpc('get_league_v3_with_crown_rules')).rejects.toThrow(/permission denied/)
+  } finally { await db.exec('reset role') }
 })
