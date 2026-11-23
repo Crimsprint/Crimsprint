@@ -1,4 +1,4 @@
-// Theme acceptance checks: no hex colors outside the token file, and WCAG AA contrast for every text pairing we use.
+// Theme acceptance checks: UI colors stay in the token file, and WCAG AA contrast for every text pairing we use.
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
@@ -31,9 +31,10 @@ const pairs: [string, string, number][] = [
 ]
 
 describe('theme tokens', () => {
-  it('has no hex colors outside globals.css', () => {
+  it('keeps UI colors in globals.css and avatar illustration colors in the artwork', () => {
+    const colorSources = ['src/app/globals.css', 'src/components/Avatar.tsx', 'src/lib/avatar.ts']
     const hits = execSync(`grep -rnE "#[0-9A-Fa-f]{3,8}\\b" src --include=*.ts --include=*.tsx --include=*.css || true`, { encoding: 'utf8' })
-      .split('\n').filter((l) => l && !l.startsWith('src/app/globals.css'))
+      .split('\n').filter((l) => l && !colorSources.some((path) => l.startsWith(path + ':')))
     expect(hits).toEqual([])
   })
   it('uses exactly the brief\'s palette values', () => {

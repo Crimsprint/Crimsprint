@@ -5,9 +5,11 @@ import { Suspense, useEffect, useId, useRef, useState } from 'react'
 import { Alert, Button, Check, ProgressBar, Screen, XIcon } from '@/components/ui'
 import { Tex } from '@/components/Tex'
 import { MathTools } from '@/components/MathTools'
+import { Avatar } from '@/components/Avatar'
 import { Mascot } from '@/components/Mascot'
 import { ReportItem } from '@/components/ReportItem'
 import { ACHIEVEMENTS } from '@/lib/achievements'
+import type { AvatarSource } from '@/lib/avatar'
 import { rpc, supabase } from '@/lib/supabase'
 
 type Item = {
@@ -230,6 +232,12 @@ export default function SessionPage() {
 
 function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; onDone: () => void }) {
   const [earned, setEarned] = useState<string[]>([])
+  const [avatar, setAvatar] = useState<AvatarSource>()
+  useEffect(() => {
+    let active = true
+    rpc<AvatarSource>('get_profile').then((value) => { if (active) setAvatar(value) }).catch(() => {})
+    return () => { active = false }
+  }, [])
   useEffect(() => {
     // Achievements the triggers awarded during this session.
     supabase().from('sessions').select('created_at').eq('id', sessionId).single()
@@ -245,12 +253,11 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
     : s.mode === 'drill' ? (s.total < s.planned ? 'Time’s up!' : 'Drill complete')
     : s.mode === 'mistakes' ? 'Mistakes reviewed'
     : s.passed ? 'Level complete!' : 'Lesson complete'
-  // The raccoon celebrates a pass, a finished practice or a streak milestone, and encourages after a miss.
   const cheer = (s.status === 'completed' && (s.passed || !['lesson', 'unit_test'].includes(s.mode))) || earned.some((c) => c.startsWith('streak_'))
   return (
     <Screen className="space-y-6">
       <div className="flex items-center gap-4">
-        <Mascot pose={cheer ? 'celebrating' : 'encouraging'} size={88} priority />
+        <Avatar {...avatar} size={88} alt="Your avatar" />
         <div>
           <h1 className="text-3xl font-bold">{title}</h1>
           {!cheer && <p className="text-text-muted">Every miss is a question you’ll get right next time.</p>}

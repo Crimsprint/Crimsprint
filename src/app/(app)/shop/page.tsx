@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { ACCESSORIES, Avatar, type Accessory } from '@/components/Avatar'
+import Link from 'next/link'
 import { NavIcon } from '@/components/AppShell'
 import { Alert, Button, Flame, Screen } from '@/components/ui'
 import { CURRENCY } from '@/lib/config'
 import { requireUser, rpc, type Profile } from '@/lib/supabase'
 
-// Rules mirror buy_item (supabase/migrations/0007_pages_shop_drills.sql): freezes max 2, consumables max 3, accessories once.
+// Rules mirror buy_item: freezes max 2 and consumables max 3.
 const POWER_UPS = [
   { item: 'streak_freeze', name: 'Streak freeze', what: 'Covers one missed day so your streak survives.', icon: <Flame className="size-7" /> },
   { item: 'mistake_boost', name: 'Mistake boost', what: '+3 mistakes on your next lesson.', icon: <span className="text-2xl font-bold" aria-hidden>+3</span> },
@@ -71,23 +71,10 @@ export default function ShopPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="acc" className="space-y-3">
-        <h2 id="acc" className="text-xl font-bold">Raccoon accessories</h2>
-        <p className="text-sm text-text-muted">Wear them on your profile and the leaderboard.</p>
-        <ul className="grid gap-3 sm:grid-cols-3">
-          {(Object.keys(ACCESSORIES) as Accessory[]).map((a) => {
-            const owned = held(a) > 0, price = p.prices[a]
-            return (
-              <li key={a} className="flex flex-col items-center gap-3 rounded-2xl border-2 border-border bg-surface p-4 text-center">
-                <Avatar avatar={p.avatar} accessory={a} size={96} />
-                <h3 className="font-semibold">{ACCESSORIES[a]} <span className="font-normal text-text-muted">· {price} {CURRENCY}</span></h3>
-                <Button className="w-full" disabled={busy || owned || p.coins < price} onClick={() => buy(a, ACCESSORIES[a])}>
-                  {owned ? 'Owned' : p.coins < price ? `Need ${price - p.coins} more` : `${price} ${CURRENCY}`}<span className="sr-only">: {ACCESSORIES[a]}, {price} {CURRENCY}</span>
-                </Button>
-              </li>
-            )
-          })}
-        </ul>
+      <section aria-labelledby="wardrobe" className="space-y-2 rounded-2xl border-2 border-border bg-surface p-4">
+        <h2 id="wardrobe" className="text-xl font-bold">Avatar items</h2>
+        <p className="text-text-muted">Try on clothes and accessories in the dressing room.</p>
+        <Link href="/dressing-room" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">Open dressing room</Link>
       </section>
     </Screen>
   )

@@ -3,11 +3,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Avatar } from '@/components/Avatar'
+import type { AvatarSource, Outfit } from '@/lib/avatar'
 import { EXAM_PROFILES, type Exam } from '@/lib/exams'
 import { requireUser, supabase } from '@/lib/supabase'
 
-const ExamContext = createContext<{ exam: Exam; setExam: (exam: Exam) => void }>({ exam: 'sat', setExam: () => {} })
-export const useExam = () => useContext(ExamContext)
+const AppContext = createContext<{ exam: Exam; setExam: (exam: Exam) => void; updateAvatar: (outfit: Outfit) => void }>({
+  exam: 'sat', setExam: () => {}, updateAvatar: () => {},
+})
+export const useExam = () => useContext(AppContext)
+export const useUpdateAvatar = () => useContext(AppContext).updateAvatar
 
 const ICONS = {
   learn: 'M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',
@@ -78,15 +83,22 @@ function More({ active }: { active: boolean }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname()
   const [exam, setExam] = useState<Exam>('sat')
+  const [avatar, setAvatar] = useState<AvatarSource>()
   useEffect(() => {
     let active = true
-    requireUser().then((u) => supabase().from('profiles').select('exam_target').eq('id', u.id).single())
-      .then(({ data }) => { if (active && data) setExam(data.exam_target) }).catch(() => {})
+    requireUser().then((u) => supabase().from('profiles').select('exam_target, avatar, accessory, outfit').eq('id', u.id).single())
+      .then(({ data }) => {
+        if (active && data) {
+          setExam(data.exam_target)
+          setAvatar((current) => current ?? data)
+        }
+      }).catch(() => {})
     return () => { active = false }
   }, [])
+  const inDressingRoom = inside(path, '/dressing-room')
   const inMore = MORE.some((m) => inside(path, m.href))
   return (
-    <ExamContext.Provider value={{ exam, setExam }}>
+    <AppContext.Provider value={{ exam, setExam, updateAvatar: (outfit) => setAvatar({ outfit }) }}>
       <nav aria-label="Main" className="fixed inset-y-0 left-0 z-20 hidden w-20 flex-col gap-1 border-r-2 border-border bg-sidebar px-2 py-6 md:flex lg:w-60 lg:px-4">
         <Link href="/learn" className="mb-6 flex items-center gap-3 rounded-xl px-2 md:justify-center lg:justify-start">
           <Image src="/mascot/raccoon-head.png" alt="Crimsprint raccoon mascot" width={44} height={44} priority className="size-11" />
@@ -94,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
         <ul className="space-y-1">
           {NAV.map((n) => {
-            const active = inside(path, n.href)
+            const active = inside(path, n.href) || (n.href === '/profile' && inDressingRoom)
             return (
               <li key={n.href}>
                 <Link href={n.href} aria-current={active ? 'page' : undefined} title={n.label} className={item(active)}>
@@ -111,7 +123,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-20 border-t-2 border-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden">
         <ul className="grid grid-cols-5">
           {MOBILE.map((n) => {
-            const active = inside(path, n.href) || (n.href === '/profile' && (inMore || inside(path, '/shop')))
+            const active = inside(path, n.href) || (n.href === '/profile' && (inMore || inDressingRoom || inside(path, '/shop')))
             return (
               <li key={n.href}>
                 <Link href={n.href} aria-current={active ? 'page' : undefined}
@@ -126,9 +138,15 @@ export function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       <div className="flex flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0 md:pl-20 lg:pl-60">
-        {exam === 'psat' && <header className="px-4 pt-3 text-center text-xs font-semibold text-text-muted">{EXAM_PROFILES[exam].label}</header>}
+        <header className="flex min-h-12 items-center justify-between gap-3 border-b border-border bg-surface px-4 md:px-6">
+          <span className="text-xs font-semibold text-text-muted">{exam === 'psat' ? EXAM_PROFILES[exam].label : ''}</span>
+          <Link href="/dressing-room" aria-label="Open dressing room" className="flex min-h-11 items-center gap-2 rounded-lg px-1 text-xs font-semibold">
+            <Avatar {...avatar} size={32} />
+            <span className="hidden sm:inline">Dressing room</span>
+          </Link>
+        </header>
         {children}
       </div>
-    </ExamContext.Provider>
+    </AppContext.Provider>
   )
 }

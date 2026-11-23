@@ -2,11 +2,12 @@
 import { useEffect, useState } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { Alert, Button, Screen } from '@/components/ui'
+import type { AvatarSource } from '@/lib/avatar'
 import { EXAM_PROFILES, type Exam } from '@/lib/exams'
 import { timeLeft, utcDate } from '@/lib/dates'
 import { requireUser, rpc } from '@/lib/supabase'
 
-type Member = { exam_target: Exam; name: string; avatar: string; accessory: string | null; points: number; me: boolean }
+type Member = AvatarSource & { exam_target: Exam; name: string; points: number; me: boolean }
 type League = { opted_out: true } | {
   opted_out: false; tier: number; tier_name: string; week_end: string; promote: number; demote: number; members: Member[]
 }
@@ -69,7 +70,7 @@ export default function Leaderboards() {
             {i === downFrom && i > 0 && <Divider up={false} />}
             <div className={`flex items-center gap-3 px-4 py-3 ${m.me ? 'bg-surface-muted font-semibold' : ''}`}>
               <span className="w-6 text-right tabular-nums">{i + 1}</span>
-              <Avatar avatar={m.avatar} accessory={m.accessory} size={40} />
+              <Avatar {...m} size={32} />
               <span className="flex min-w-0 flex-1 items-center gap-2">
                 <span className="truncate">{m.name}{m.me && ' (you)'}</span>
                 <span className="shrink-0 rounded border border-border px-1 text-[10px] font-semibold text-text-muted">{EXAM_PROFILES[m.exam_target ?? 'sat'].tag}</span>
