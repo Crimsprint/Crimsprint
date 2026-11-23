@@ -166,3 +166,14 @@ body {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .avatar-aura-motion {
+    animation: avatar-aura-pulse 5s ease-in-out infinite;
+  }
+}
+
+@keyframes avatar-aura-pulse {
+  0%, 100% { opacity: .84; }
+  50% { opacity: 1; }
+}

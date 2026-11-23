@@ -1,7 +1,7 @@
 'use client'
 import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
-import type { Outfit } from './avatar'
+import type { StoredOutfit } from './avatar'
 import { clearDraft } from './onboardingDraft'
 import { EXPIRED_MESSAGE, isAuthFailure, isDeadSession, mayRecover } from './session'
 
@@ -90,7 +90,7 @@ export type Tier = 'easy' | 'medium' | 'hard'
 
 /** get_profile: the profile page and shop. */
 export type Profile = {
-  display_name: string | null; handle: string; avatar: string; accessory: string | null; outfit?: Outfit | null; joined: string
+  display_name: string | null; handle: string; avatar: string; accessory: string | null; outfit?: StoredOutfit | null; joined: string
   coins: number; freezes: number; streak: number; longest_streak: number; total_points: number; league: string | null
   inventory: Record<string, number>; prices: Record<string, number>; achievements: { code: string; earned_at: string }[]
 }

@@ -1,7 +1,8 @@
-export const LAYERS = ['background', 'skin', 'bottoms', 'shoes', 'top', 'outerwear', 'face', 'hair', 'headwear', 'accessory', 'effect'] as const
+export const LAYERS = ['background', 'effect', 'fur', 'bottoms', 'shoes', 'top', 'outerwear', 'face', 'furStyle', 'headwear', 'eyewear', 'accessory'] as const
 export type Layer = (typeof LAYERS)[number]
-export type Outfit = Partial<Record<Layer, string>> & { hairColor?: string }
-export type AvatarSource = { avatar?: string; accessory?: string | null; outfit?: Outfit | null }
+export type Outfit = Partial<Record<Layer, string>>
+export type StoredOutfit = Outfit & { skin?: string; hair?: string; hairColor?: string }
+export type AvatarSource = { avatar?: string; accessory?: string | null; outfit?: StoredOutfit | null }
 
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'] as const
 type Rarity = (typeof RARITIES)[number]
@@ -26,18 +27,18 @@ export const CATALOG = [
     ['outer_varsity', 'Varsity Jacket', 'epic', '#783951'],
     ['outer_blazer', 'School Blazer', 'rare', '#455c82'],
   ]),
-  ...items('hair', [
-    ['hair_crop', 'Side Sweep'], ['hair_bob', 'Pageboy Bob'], ['hair_curls', 'Cloud Curls'], ['hair_bangs', 'Soft Fringe'],
-    ['hair_buns', 'Double Buns'], ['hair_quiff', 'High Quiff'], ['hair_buzz', 'Close Crop'], ['hair_pony', 'Side Ponytail'],
+  ...items('furStyle', [
+    ['style_ears', 'Ear Tufts'], ['style_cheeks', 'Cheek Fluff'], ['style_tuft', 'Head Tuft'],
+    ['style_sleek', 'Sleek'], ['style_messy', 'Messy'], ['style_curl', 'Curly Crest'],
   ]),
   ...items('face', [
     ['face_smile', 'Easy Smile'], ['face_grin', 'Big Grin'], ['face_wink', 'Wink'],
     ['face_calm', 'Quiet Focus'], ['face_spark', 'Bright Eyes'],
   ]),
-  ...items('skin', [
-    ['skin_pearl', 'Pearl', undefined, '#ffe2cb'], ['skin_peach', 'Peach', undefined, '#f4c6a4'],
-    ['skin_sand', 'Sand', undefined, '#dca37b'], ['skin_amber', 'Amber', undefined, '#b97752'],
-    ['skin_cocoa', 'Cocoa', undefined, '#90573e'], ['skin_umber', 'Umber', undefined, '#633c31'],
+  ...items('fur', [
+    ['fur_gray', 'Classic Gray', undefined, '#8c8c95'], ['fur_charcoal', 'Charcoal', undefined, '#575461'],
+    ['fur_cream', 'Cream', undefined, '#d4b996'], ['fur_cinnamon', 'Cinnamon', undefined, '#aa715d'],
+    ['fur_frost', 'Frost', undefined, '#bac5d0'], ['fur_midnight', 'Midnight', undefined, '#566b89'],
   ]),
   ...items('bottoms', [
     ['bottom_denim', 'Cuffed Denim', 'common', '#6583aa'], ['bottom_chinos', 'Field Chinos', 'common', '#bd9264'],
@@ -54,8 +55,16 @@ export const CATALOG = [
     ['cap', 'Graduation Cap', 'rare', '#38364d'], ['hat_headphones', 'Study Headphones', 'epic', '#9d6297'],
     ['hat_bucket', 'Field Bucket Hat', 'rare', '#e2bb7b'],
   ]),
+  ...items('eyewear', [
+    ['eye_sunglasses', 'Sunglasses', 'rare', '#38334f'], ['glasses', 'Reading Glasses', 'common', '#c99a65'],
+    ['eye_visor', 'Sports Visor', 'common', '#4db2a7'], ['eye_stars', 'Star Shades', 'epic', '#dfa45d'],
+  ]),
+  ...items('effect', [
+    ['effect_sparkle', 'Sparkle', 'common'], ['effect_study_flame', 'Study Flame', 'rare'],
+    ['effect_crimson', 'Crimson Glow', 'epic'], ['effect_galaxy', 'Galaxy Swirl', 'legendary'],
+  ]),
   ...items('accessory', [
-    ['acc_backpack', 'Bookbag', 'rare', '#58877c'], ['glasses', 'Reading Glasses', 'common', '#625070'],
+    ['acc_backpack', 'Bookbag', 'rare', '#58877c'],
     ['acc_pencil', 'Giant Pencil', 'common', '#f4bd5e'], ['acc_scarf', 'Study Scarf', 'rare', '#763c51'],
     ['acc_keychain', 'Raccoon-Tail Keychain', 'epic', '#887481'], ['bowtie', 'Bow Tie', 'common', '#a64456'],
   ]),
@@ -67,20 +76,41 @@ export const CATALOG = [
 
 export const ITEMS = new Map(CATALOG.map((item) => [item.id, item]))
 export const DEFAULT_OUTFIT = {
-  skin: 'skin_peach', bottoms: 'bottom_joggers', shoes: 'shoes_canvas', top: 'top_tee',
-  face: 'face_smile', hair: 'hair_crop', hairColor: '#513448',
+  fur: 'fur_gray', bottoms: 'bottom_joggers', shoes: 'shoes_canvas', top: 'top_tee',
+  face: 'face_smile', furStyle: 'style_tuft',
 } satisfies Outfit
 
-export const LEGACY_COLORS: Readonly<Record<string, string>> = {
-  crimson: '#513448', slate: '#657988', chocolate: '#593d28', green: '#366453', ink: '#282431', putty: '#ab8f75',
+const LEGACY_BADGES: Readonly<Record<string, string>> = {
+  crimson: 'fur_gray', slate: 'fur_frost', chocolate: 'fur_cinnamon',
+  green: 'fur_midnight', ink: 'fur_charcoal', putty: 'fur_cream',
+}
+const LEGACY_SKIN: Readonly<Record<string, string>> = {
+  skin_pearl: 'fur_frost', skin_peach: 'fur_gray', skin_sand: 'fur_cream',
+  skin_amber: 'fur_cinnamon', skin_cocoa: 'fur_charcoal', skin_umber: 'fur_midnight',
+}
+const LEGACY_HAIR: Readonly<Record<string, string>> = {
+  hair_crop: 'style_tuft', hair_bob: 'style_cheeks', hair_curls: 'style_curl', hair_bangs: 'style_ears',
+  hair_buns: 'style_ears', hair_quiff: 'style_tuft', hair_buzz: 'style_sleek', hair_pony: 'style_messy',
 }
 
-export const HAIR_PRESETS = { ...LEGACY_COLORS, copper: '#a84a32', gold: '#c28a49' }
-
 export function resolveOutfit(source: AvatarSource = {}): Outfit {
-  if (source.outfit) return { ...DEFAULT_OUTFIT, ...source.outfit }
-  const outfit: Outfit = { ...DEFAULT_OUTFIT, hairColor: LEGACY_COLORS[source.avatar ?? 'crimson'] ?? DEFAULT_OUTFIT.hairColor }
+  const stored = source.outfit
+  if (stored) {
+    const outfit: Outfit = { ...DEFAULT_OUTFIT }
+    for (const layer of LAYERS) {
+      const item = stored[layer]
+      if (item && ITEMS.get(item)?.layer === layer) outfit[layer] = item
+    }
+    if (!stored.fur && stored.skin && Object.hasOwn(LEGACY_SKIN, stored.skin)) outfit.fur = LEGACY_SKIN[stored.skin]
+    if (!stored.furStyle && stored.hair && Object.hasOwn(LEGACY_HAIR, stored.hair)) outfit.furStyle = LEGACY_HAIR[stored.hair]
+    if (!stored.eyewear && stored.accessory === 'glasses') outfit.eyewear = 'glasses'
+    return outfit
+  }
+  const badge = source.avatar ?? 'crimson'
+  const outfit: Outfit = { ...DEFAULT_OUTFIT }
+  if (Object.hasOwn(LEGACY_BADGES, badge)) outfit.fur = LEGACY_BADGES[badge]
   if (source.accessory === 'cap') outfit.headwear = 'cap'
-  if (source.accessory === 'glasses' || source.accessory === 'bowtie') outfit.accessory = source.accessory
+  if (source.accessory === 'glasses') outfit.eyewear = 'glasses'
+  if (source.accessory === 'bowtie') outfit.accessory = 'bowtie'
   return outfit
 }

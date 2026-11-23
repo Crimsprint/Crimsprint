@@ -1,4 +1,4 @@
-# Layered avatars
+# Raccoon avatars
 
 ## Dressing room screenshots
 
@@ -9,15 +9,29 @@
 
 The screenshots use a local test account. The phone captures show the entire scrollable page with the fixed tab bar placed at the bottom of the image.
 
+## Default mascot and six fur colors
+
+| Classic Gray (default) | Charcoal | Cream |
+| --- | --- | --- |
+| ![Default raccoon in Classic Gray](default-raccoon.png) | ![Charcoal raccoon](fur-charcoal.png) | ![Cream raccoon](fur-cream.png) |
+
+| Cinnamon | Frost | Midnight |
+| --- | --- | --- |
+| ![Cinnamon raccoon](fur-cinnamon.png) | ![Frost raccoon](fur-frost.png) | ![Midnight raccoon](fur-midnight.png) |
+
 ## Six sample outfits
 
 | Library Night | Relay Captain | Crimson Graduate |
 | --- | --- | --- |
 | ![Library Night](01-library-night.png) | ![Relay Captain](02-relay-captain.png) | ![Crimson Graduate](03-crimson-graduate.png) |
 
-| Art Club | Rooftop Radio | Campus Stroll |
+| Art Club | Rooftop Radio with Sunglasses and Galaxy Swirl | Campus Stroll |
 | --- | --- | --- |
 | ![Art Club](04-art-club.png) | ![Rooftop Radio](05-rooftop-radio.png) | ![Campus Stroll](06-campus-stroll.png) |
+
+## Leaderboard avatar at 32 px
+
+![Leaderboard row with a 32 px raccoon avatar](leaderboard-32px.png)
 
 ## Coin pricing
 
@@ -32,10 +46,10 @@ The active-week estimate assumes studying five days, completing two quests per s
 | Epic | 300 | 2.14 weeks |
 | Legendary | 700 | 5 weeks |
 
-The Graduation Cap (100), Reading Glasses (60), and Bow Tie (40) retain their previous prices. All six skin tones, eight hairstyles, custom hair color, and five expressions are free, as are the starter tee, joggers, and sneakers.
+The Graduation Cap (100), Reading Glasses (60), and Bow Tie (40) retain their previous prices. All six fur colors, six fur styles, and five expressions are free, as are the starter tee, joggers, and sneakers. The four purchasable auras use the standard rarity prices. The champion aura is reserved for the future weekly crown award and is outside the purchase and equip catalog.
 
 ## Database rollout
 
-Apply [0012_layered_avatars.sql](../../supabase/migrations/0012_layered_avatars.sql) before deploying the avatar client. The new client stores equipped item IDs and a hex hair color in `profiles.outfit`. Until the learner saves an outfit, the renderer uses the legacy avatar color as a matching hair tint. An equipped Graduation Cap maps to headwear, while Reading Glasses and Bow Tie map to accessories. The existing inventory IDs also make previously bought, unequipped items available to wear.
+Apply [0013_raccoon_avatars.sql](../../supabase/migrations/0013_raccoon_avatars.sql) after 0012 and before deploying the raccoon client. The migration keeps all paid IDs and prices. Reading Glasses retains its `glasses` ID and moves to Eyewear, so it can be worn with a scarf or another accessory.
 
-The old client can continue using the legacy avatar fields and RPC signatures. The database uses the existing `buy_item` RPC for purchases and checks slot validity and paid-item ownership when equipping.
+The client renders previously saved human outfits with the matching fur color and style. `set_avatar_outfit` accepts those older outfits and saves them in the new format. The fixed six-color palette carries over the closest coat and omits the old custom hair tint. The legacy profile fields, inventory, and RPC signatures stay compatible with the live site.

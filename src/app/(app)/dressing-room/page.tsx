@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useUpdateAvatar } from '@/components/AppShell'
 import { Avatar, AvatarItemArt } from '@/components/Avatar'
 import { Alert, Lock, Screen } from '@/components/ui'
-import { CATALOG, DEFAULT_OUTFIT, HAIR_PRESETS, ITEMS, LAYERS, RARITIES, resolveOutfit, type AvatarItem, type Layer, type Outfit } from '@/lib/avatar'
+import { CATALOG, DEFAULT_OUTFIT, ITEMS, LAYERS, RARITIES, resolveOutfit, type AvatarItem, type Layer, type Outfit } from '@/lib/avatar'
 import { CURRENCY } from '@/lib/config'
 import { requireUser, rpc, type Profile } from '@/lib/supabase'
 import './room.css'
@@ -13,10 +13,12 @@ import './room.css'
 const CATEGORIES: { label: string; layers: Layer[] }[] = [
   { label: 'Tops', layers: ['top', 'outerwear'] }, { label: 'Bottoms', layers: ['bottoms'] },
   { label: 'Shoes', layers: ['shoes'] }, { label: 'Headwear', layers: ['headwear'] },
-  { label: 'Accessories', layers: ['accessory'] }, { label: 'Backgrounds', layers: ['background'] },
-  { label: 'Hair', layers: ['hair'] }, { label: 'Face', layers: ['face'] }, { label: 'Skin', layers: ['skin'] },
+  { label: 'Eyewear', layers: ['eyewear'] }, { label: 'Accessories', layers: ['accessory'] },
+  { label: 'Backgrounds', layers: ['background'] }, { label: 'Aura', layers: ['effect'] },
+  { label: 'Fur color', layers: ['fur'] }, { label: 'Fur style', layers: ['furStyle'] }, { label: 'Face', layers: ['face'] },
 ]
-const OPTIONAL: Layer[] = ['outerwear', 'headwear', 'accessory', 'background']
+const OPTIONAL: Layer[] = ['outerwear', 'headwear', 'eyewear', 'accessory', 'background', 'effect']
+const REMOVE_LABEL: Partial<Record<Layer, string>> = { outerwear: 'jacket', effect: 'aura' }
 const random = <T,>(values: T[]) => values[Math.floor(Math.random() * values.length)]
 
 function Coin({ value }: { value: number }) {
@@ -52,7 +54,7 @@ export default function DressingRoomPage() {
   const locked = activeItem && !owns(activeItem) ? activeItem : undefined
   const lockedPrice = locked ? price(locked) : undefined
   const preview = locked ? { ...draft, [locked.layer]: locked.id } : draft
-  const changed = draft.hairColor !== saved.hairColor || LAYERS.some((layer) => draft[layer] !== saved[layer])
+  const changed = LAYERS.some((layer) => draft[layer] !== saved[layer])
   const layers = CATEGORIES[category].layers
   const available = CATALOG.filter((item) => layers.includes(item.layer)
     && (item.free || price(item) !== undefined)
@@ -84,9 +86,8 @@ export default function DressingRoomPage() {
   }
 
   function randomize() {
-    const next: Outfit = { hairColor: random(Object.values(HAIR_PRESETS)) }
+    const next: Outfit = {}
     for (const layer of LAYERS) {
-      if (layer === 'effect') continue
       const options = CATALOG.filter((item) => item.layer === layer && owns(item))
       const item = random(OPTIONAL.includes(layer) ? [undefined, ...options] : options)
       if (item) next[layer] = item.id
@@ -207,16 +208,8 @@ export default function DressingRoomPage() {
           </div>
 
           <div id="avatar-items" role="tabpanel" aria-labelledby={`avatar-category-${category}`} tabIndex={0} className="dressing-room-items">
-            {layers.includes('hair') && <div className="dressing-room-tint">
-              <label htmlFor="avatar-hair-color">Hair color</label>
-              {Object.entries(HAIR_PRESETS).map(([name, color]) => <button key={name} type="button" disabled={busy} aria-label={`${name} hair`}
-                aria-pressed={draft.hairColor === color} style={{ backgroundColor: color }}
-                onClick={() => setDraft((outfit) => ({ ...outfit, hairColor: color }))} />)}
-              <input id="avatar-hair-color" type="color" value={draft.hairColor ?? DEFAULT_OUTFIT.hairColor} disabled={busy}
-                onChange={(e) => setDraft((outfit) => ({ ...outfit, hairColor: e.target.value }))} />
-            </div>}
             {OPTIONAL.filter((layer) => layers.includes(layer) && preview[layer]).map((layer) => (
-              <button key={layer} type="button" className="dressing-room-remove" disabled={busy} onClick={() => remove(layer)}>Remove {layer === 'outerwear' ? 'jacket' : layer}</button>
+              <button key={layer} type="button" className="dressing-room-remove" disabled={busy} onClick={() => remove(layer)}>Remove {REMOVE_LABEL[layer] ?? layer}</button>
             ))}
             {available.length === 0 && <p className="dressing-room-empty">No {filter === 'all' ? 'available' : filter} items in this category.</p>}
             <ul className="dressing-room-grid">
@@ -225,7 +218,7 @@ export default function DressingRoomPage() {
                 return <li key={item.id}>
                   <button type="button" className="dressing-room-item" aria-pressed={showing} disabled={busy} onClick={() => tryOn(item)}>
                     <div className="dressing-room-art">
-                      <AvatarItemArt item={item} hairColor={draft.hairColor ?? DEFAULT_OUTFIT.hairColor} />
+                      <AvatarItemArt item={item} fur={draft.fur} />
                       <span className="dressing-room-rarity" data-rarity={item.rarity}>{item.rarity}</span>
                     </div>
                     <span className="dressing-room-item-name">{item.name}</span>

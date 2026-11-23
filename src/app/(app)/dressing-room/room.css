@@ -158,10 +158,6 @@
 .dressing-room-item-meta { display: flex; align-items: center; gap: .26rem; padding: .34rem .29rem .26rem; font-size: .7rem; color: var(--wardrobe-muted); line-height: 1.12; }
 .dressing-room-empty { color: var(--wardrobe-muted); padding-block: .55rem; }
 .dressing-room-remove { min-height: 2.75rem; padding: .3rem .7rem; margin-bottom: .62rem; border: 1px solid var(--wardrobe-edge); border-radius: .6rem; font-size: .81rem; font-weight: 650; }
-.dressing-room-tint { display: flex; align-items: center; flex-wrap: wrap; gap: .42rem; margin-bottom: .84rem; }
-.dressing-room-tint label { font-size: .82rem; font-weight: 650; }
-.dressing-room-tint button, .dressing-room-tint input { width: 2rem; height: 2rem; border: 1px solid var(--wardrobe-edge); border-radius: .45rem; }
-.dressing-room-tint button[aria-pressed="true"] { outline: 2px solid var(--wardrobe-selection); outline-offset: 2px; }
 
 @media (min-width: 54rem) {
   .dressing-room-layout { grid-template-columns: minmax(0, 1fr) minmax(17rem, .76fr); }
