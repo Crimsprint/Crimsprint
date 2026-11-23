@@ -3,21 +3,22 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { MORE } from '@/components/AppShell'
 import { Avatar } from '@/components/Avatar'
+import { CrownBadge, CrownCount } from '@/components/Crown'
 import { Alert, Button, Screen } from '@/components/ui'
 import { ACHIEVEMENTS } from '@/lib/achievements'
-import { requireUser, rpc, type Profile } from '@/lib/supabase'
+import { requireUser, rpc, type ProfileWithCrown } from '@/lib/supabase'
 
 const NAME = /^[A-Za-z0-9][A-Za-z0-9 ._-]{1,18}[A-Za-z0-9]$/ // same rule as the profiles.display_name check
 
 export default function ProfilePage() {
-  const [p, setP] = useState<Profile | null>(null)
+  const [p, setP] = useState<ProfileWithCrown | null>(null)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    requireUser().then(() => rpc<Profile>('get_profile')).then((x) => {
+    requireUser().then(() => rpc<ProfileWithCrown>('get_profile_v2')).then((x) => {
       setP(x)
       setName(x.display_name ?? '')
     }).catch((e) => setError(e.message))
@@ -48,6 +49,7 @@ export default function ProfilePage() {
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-bold">{p.display_name ?? p.handle}</h1>
           <p className="text-text-muted">Joined {new Date(p.joined).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</p>
+          <CrownBadge expiresAt={p.crown_expires_at} />
           <Link href="/dressing-room" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">Customize avatar</Link>
         </div>
       </header>
@@ -59,6 +61,7 @@ export default function ProfilePage() {
             <dt className="text-sm text-text-muted">{k}</dt><dd className="text-xl font-bold">{v}</dd>
           </div>
         ))}
+        <CrownCount count={p.crowns_won} />
       </dl>
 
       <form onSubmit={save} className="space-y-4 rounded-2xl border-2 border-border bg-surface p-4">

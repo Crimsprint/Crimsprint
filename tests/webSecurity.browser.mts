@@ -29,7 +29,9 @@ const backend = createServer((req, res) => {
   if (!learner) { send({ message: 'Missing test session' }, 401); return }
   switch (req.url?.split('?')[0]) {
     case '/auth/v1/user': return send(learner.user)
-    case '/rest/v1/profiles': return send({ exam_target: index ? 'psat' : 'sat' })
+    case '/rest/v1/profiles':
+    case '/rest/v1/rpc/get_my_avatar':
+      return send({ exam_target: index ? 'psat' : 'sat', avatar: 'crimson', crown_expires_at: null })
     case '/rest/v1/skills': return send([])
     case '/rest/v1/rpc/get_home': return send({ skills: [], diagnosed: false })
     case '/rest/v1/rpc/get_progress_v2':
@@ -37,9 +39,10 @@ const backend = createServer((req, res) => {
     case '/rest/v1/rpc/admin_reports':
       return index ? send([]) : send({ message: 'admin only: update public.profiles set is_admin = true' }, 400)
     case '/rest/v1/rpc/get_profile':
+    case '/rest/v1/rpc/get_profile_v2':
       return send({
         display_name: learner.name, avatar: 'crimson', joined: '2026-11-23T00:00:00Z', total_points: 23 + index,
-        streak: 1, longest_streak: 1, inventory: {}, prices: {}, achievements: [],
+        streak: 1, longest_streak: 1, coins: 0, crowns_won: 0, inventory: {}, prices: {}, achievements: [],
       })
     default: return send({ message: 'Unexpected test endpoint' }, 404)
   }
@@ -104,7 +107,7 @@ try {
     const { targetId } = await cdp('Target.createTarget', { url: 'about:blank', browserContextId })
     const { sessionId } = await cdp('Target.attachToTarget', { targetId, flatten: true })
     assert.equal((await cdp('Network.setCookie', { url: app, name: cookieName, value: cookie }, sessionId)).success, true)
-    return async (route: string, title: string) => {
+    const open = async (route: string, title: string) => {
       await cdp('Page.navigate', { url: app + route }, sessionId)
       return until(async () => {
         const { result } = await cdp('Runtime.evaluate', {
@@ -115,6 +118,13 @@ try {
         return undefined
       }, `${route} to show ${title}`)
     }
+    return Object.assign(open, {
+      async evaluate(expression: string) {
+        const { result, exceptionDetails } = await cdp('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }, sessionId)
+        if (exceptionDetails) throw new Error(exceptionDetails.exception?.description ?? exceptionDetails.text)
+        return result.value
+      },
+    })
   }
 
   const [first, second] = learners
@@ -150,7 +160,27 @@ try {
   assert.equal(signedOut.headers.get('x-frame-options'), 'DENY')
   assert.doesNotMatch(await profileA('/admin', 'Not found'), /admin only|is_admin|public\.profiles|Choose…/)
   await profileB('/admin', 'Content')
-  console.log('PASS: isolated account data, clean HTML and prefetch payloads, anti-framing headers, and generic admin denial.')
+  await profileA('/dressing-room', 'Dressing room')
+  const furClick = await profileA.evaluate(`(async () => {
+    let writes = 0;
+    for (const method of ['write', 'writeText']) {
+      Object.defineProperty(navigator.clipboard, method, { value: async () => { writes++ } });
+    }
+    const exec = document.execCommand.bind(document);
+    document.execCommand = (command, ...args) => {
+      if (command.toLowerCase() === 'copy' || command.toLowerCase() === 'cut') { writes++; return false; }
+      return exec(command, ...args);
+    };
+    const nextFrame = () => new Promise(requestAnimationFrame);
+    [...document.querySelectorAll('[role=tab]')].find((tab) => tab.textContent === 'Fur color').click();
+    await nextFrame();
+    const cream = [...document.querySelectorAll('[role=tabpanel] button')].find((item) => item.textContent.includes('Cream'));
+    cream.click();
+    await nextFrame();
+    return { writes, selected: cream.getAttribute('aria-pressed') || document.querySelector('[role=tabpanel] button[aria-pressed=true]')?.textContent.includes('Cream') };
+  })()`)
+  assert.deepEqual(furClick, { writes: 0, selected: 'true' })
+  console.log('PASS: isolated account data, clean HTML and prefetch payloads, anti-framing headers, generic admin denial, and clipboard-free fur selection.')
 } finally {
   socket?.close()
   next.kill()

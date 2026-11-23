@@ -235,7 +235,7 @@ function Completion({ s, sessionId, onDone }: { s: Summary; sessionId: string; o
   const [avatar, setAvatar] = useState<AvatarSource>()
   useEffect(() => {
     let active = true
-    rpc<AvatarSource>('get_profile').then((value) => { if (active) setAvatar(value) }).catch(() => {})
+    rpc<AvatarSource>('get_my_avatar').then((value) => { if (active) setAvatar(value) }).catch(() => {})
     return () => { active = false }
   }, [])
   useEffect(() => {

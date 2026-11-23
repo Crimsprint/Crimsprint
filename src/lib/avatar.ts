@@ -2,7 +2,7 @@ export const LAYERS = ['background', 'effect', 'fur', 'bottoms', 'shoes', 'top',
 export type Layer = (typeof LAYERS)[number]
 export type Outfit = Partial<Record<Layer, string>>
 export type StoredOutfit = Outfit & { skin?: string; hair?: string; hairColor?: string }
-export type AvatarSource = { avatar?: string; accessory?: string | null; outfit?: StoredOutfit | null }
+export type AvatarSource = { avatar?: string; accessory?: string | null; outfit?: StoredOutfit | null; crown_expires_at?: string | null }
 
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'] as const
 type Rarity = (typeof RARITIES)[number]

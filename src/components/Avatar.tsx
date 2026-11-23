@@ -1,5 +1,8 @@
+'use client'
+
 import { useId } from 'react'
-import { DEFAULT_OUTFIT, ITEMS, LAYERS, resolveOutfit, type AvatarItem, type AvatarSource, type Layer } from '@/lib/avatar'
+import { useCrownTimeLeft } from './Crown'
+import { DEFAULT_OUTFIT, ITEMS, LAYERS, resolveOutfit, type AvatarItem, type AvatarSource, type Layer } from '../lib/avatar'
 
 const INK = '#2e2435'
 const CREAM = '#fff1d6'
@@ -247,6 +250,15 @@ function Headwear({ item, color }: { item: string; color?: string }) {
   </g>
 }
 
+function CrownHeadwear() {
+  return <g data-avatar-part="crown" {...outline}>
+    <path d="M74 25l15 8 17-21 17 21 15-8-6 23q-26 7-52 0z" fill="#f6bd5a" />
+    <path d="M79 43q27 7 54 0l-2 8q-25 6-50 0z" fill="#d99047" />
+    <path d="M99 36l7-8 7 8-7 8z" fill="#a51c30" strokeWidth="2" />
+    <path d="M86 40l5 1m30 0 5-1" fill="none" stroke={CREAM} strokeWidth="2.5" />
+  </g>
+}
+
 function Eyewear({ item, color }: { item: string; color?: string }) {
   return <g {...outline} fill={color}>
     {item === 'glasses' && <g fill="none" stroke={color} strokeWidth="3.2">
@@ -308,7 +320,7 @@ function Aura({ item, motion = false }: { item?: string; motion?: boolean }) {
   if (!item) return null
   const color = item === 'effect_study_flame' ? '#ffad61' : item === 'effect_crimson' ? '#fa5576'
     : item === 'effect_galaxy' ? '#9677f1' : '#ffcf77'
-  return <g data-avatar-part="aura" className={motion ? 'avatar-aura-motion' : undefined}>
+  return <g data-avatar-part="aura" data-aura={item} className={motion ? 'avatar-aura-motion' : undefined}>
     <defs><radialGradient id={glow}>
       <stop offset=".35" stopColor={color} stopOpacity=".06" />
       <stop offset=".72" stopColor={color} stopOpacity=".6" />
@@ -340,7 +352,8 @@ function Aura({ item, motion = false }: { item?: string; motion?: boolean }) {
       </g>
     </>}
     {item === 'effect_champion' && <g fill="#ffe7a2" stroke="#bd8643" strokeWidth="2">
-      <path d="M85 22l7 11 13-18 13 18 7-11-2 20H87z" />
+      <path d="M19 65l3 7 7 3-7 3-3 7-3-7-7-3 7-3zm190-26 4 9 9 4-9 4-4 9-4-9-9-4 9-4zm13 121 3 7 7 3-7 3-3 7-3-7-7-3 7-3z" />
+      <circle cx="29" cy="113" r="2.5" /><circle cx="218" cy="108" r="3" />
       <path d="M108 199q-73 0-88-70m88 70q75 0 94-70" fill="none" strokeWidth="3" />
       <path d="M37 167q-19 0-22-19 17 5 22 19zm34 23q-23 5-33-14 24-1 33 14zm108-23q19 0 22-19-17 5-22 19zm-34 23q23 5 33-14-24-1-33 14z" />
     </g>}
@@ -367,19 +380,28 @@ function AvatarLayer({ layer, item, fur }: { layer: Layer; item?: string; fur: s
   }
 }
 
-export function Avatar({ size = 48, alt = '', className = '', champion = false, ...source }: AvatarSource & {
-  size?: number; alt?: string; className?: string; champion?: boolean
+type AvatarProps = AvatarSource & { size?: number; alt?: string; className?: string }
+
+export function Avatar({ crown_expires_at, ...props }: AvatarProps) {
+  const champion = useCrownTimeLeft(crown_expires_at) !== null
+  return <AvatarArt {...props} champion={champion} />
+}
+
+export function AvatarArt({ size = 48, alt = '', className = '', champion, ...source }: Omit<AvatarProps, 'crown_expires_at'> & {
+  champion: boolean
 }) {
   const outfit = resolveOutfit(source)
   const fur = ITEMS.get(outfit.fur ?? DEFAULT_OUTFIT.fur)?.color ?? STARTER_FUR
   return (
     <svg viewBox={size <= 40 ? '8 9 224 224' : '0 0 240 240'} width={size} height={size}
-      role={alt ? 'img' : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : true}
+      role={alt ? 'img' : undefined} aria-label={alt ? (champion ? `${alt}, weekly champion` : alt) : undefined} aria-hidden={alt ? undefined : true}
       className={`block shrink-0 rounded-[23%] ${className}`}>
       <Background item={outfit.background} />
-      <Aura item={champion ? 'effect_champion' : outfit.effect} motion={size >= 80} />
+      <Aura item={champion ? 'effect_champion' : outfit.effect} motion={champion || size >= 80} />
       <ellipse cx="117" cy="223" rx="64" ry="8" fill={INK} opacity=".23" />
-      {LAYERS.slice(2).map((layer) => <AvatarLayer key={layer} layer={layer} item={outfit[layer]} fur={fur} />)}
+      {LAYERS.slice(2).map((layer) => layer === 'headwear' && champion
+        ? <CrownHeadwear key={layer} />
+        : <AvatarLayer key={layer} layer={layer} item={outfit[layer]} fur={fur} />)}
     </svg>
   )
 }

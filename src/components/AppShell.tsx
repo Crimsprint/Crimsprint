@@ -6,13 +6,14 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { Avatar } from '@/components/Avatar'
 import type { AvatarSource, Outfit } from '@/lib/avatar'
 import { EXAM_PROFILES, type Exam } from '@/lib/exams'
-import { requireUser, supabase } from '@/lib/supabase'
+import { requireUser, rpc } from '@/lib/supabase'
 
-const AppContext = createContext<{ exam: Exam; setExam: (exam: Exam) => void; updateAvatar: (outfit: Outfit) => void }>({
-  exam: 'sat', setExam: () => {}, updateAvatar: () => {},
+const AppContext = createContext<{ exam: Exam; setExam: (exam: Exam) => void; updateAvatar: (outfit: Outfit) => void; refreshAvatar: () => void }>({
+  exam: 'sat', setExam: () => {}, updateAvatar: () => {}, refreshAvatar: () => {},
 })
 export const useExam = () => useContext(AppContext)
 export const useUpdateAvatar = () => useContext(AppContext).updateAvatar
+export const useRefreshAvatar = () => useContext(AppContext).refreshAvatar
 
 const ICONS = {
   learn: 'M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',
@@ -84,21 +85,25 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname()
   const [exam, setExam] = useState<Exam>('sat')
   const [avatar, setAvatar] = useState<AvatarSource>()
+  const [avatarVersion, setAvatarVersion] = useState(0)
   useEffect(() => {
     let active = true
-    requireUser().then((u) => supabase().from('profiles').select('exam_target, avatar, accessory, outfit').eq('id', u.id).single())
-      .then(({ data }) => {
+    requireUser().then(() => rpc<AvatarSource & { exam_target: Exam }>('get_my_avatar'))
+      .then((data) => {
         if (active && data) {
           setExam(data.exam_target)
-          setAvatar((current) => current ?? data)
+          setAvatar((current) => ({ ...data, outfit: current?.outfit ?? data.outfit }))
         }
       }).catch(() => {})
     return () => { active = false }
-  }, [])
+  }, [avatarVersion])
   const inDressingRoom = inside(path, '/dressing-room')
   const inMore = MORE.some((m) => inside(path, m.href))
   return (
-    <AppContext.Provider value={{ exam, setExam, updateAvatar: (outfit) => setAvatar({ outfit }) }}>
+    <AppContext.Provider value={{
+      exam, setExam, updateAvatar: (outfit) => setAvatar((current) => ({ ...current, outfit })),
+      refreshAvatar: () => setAvatarVersion((version) => version + 1),
+    }}>
       <nav aria-label="Main" className="fixed inset-y-0 left-0 z-20 hidden w-20 flex-col gap-1 border-r-2 border-border bg-sidebar px-2 py-6 md:flex lg:w-60 lg:px-4">
         <Link href="/learn" className="mb-6 flex items-center gap-3 rounded-xl px-2 md:justify-center lg:justify-start">
           <Image src="/mascot/raccoon-head.png" alt="Crimsprint raccoon mascot" width={44} height={44} priority className="size-11" />

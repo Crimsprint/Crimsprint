@@ -7,7 +7,7 @@ import { Avatar, AvatarItemArt } from '@/components/Avatar'
 import { Alert, Lock, Screen } from '@/components/ui'
 import { CATALOG, DEFAULT_OUTFIT, ITEMS, LAYERS, RARITIES, resolveOutfit, type AvatarItem, type Layer, type Outfit } from '@/lib/avatar'
 import { CURRENCY } from '@/lib/config'
-import { requireUser, rpc, type Profile } from '@/lib/supabase'
+import { requireUser, rpc, type ProfileWithCrown } from '@/lib/supabase'
 import './room.css'
 
 const CATEGORIES: { label: string; layers: Layer[] }[] = [
@@ -26,7 +26,7 @@ function Coin({ value }: { value: number }) {
 }
 
 export default function DressingRoomPage() {
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<ProfileWithCrown | null>(null)
   const [draft, setDraft] = useState<Outfit>(DEFAULT_OUTFIT)
   const [category, setCategory] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
@@ -39,7 +39,7 @@ export default function DressingRoomPage() {
 
   useEffect(() => {
     let active = true
-    requireUser().then(() => rpc<Profile>('get_profile')).then((value) => {
+    requireUser().then(() => rpc<ProfileWithCrown>('get_profile_v2')).then((value) => {
       if (active) { setProfile(value); setDraft(resolveOutfit(value)) }
     }).catch((e: Error) => { if (active) setError(e.message) })
     return () => { active = false }
@@ -149,7 +149,7 @@ export default function DressingRoomPage() {
             <span>{locked ? 'Trying on' : changed ? 'Unsaved' : 'Equipped'}</span>
           </div>
           <div className="dressing-room-stage">
-            <Avatar outfit={preview} size={360} alt="Live outfit preview" />
+            <Avatar outfit={preview} crown_expires_at={profile.crown_expires_at} size={360} alt="Live outfit preview" />
           </div>
           <div className="dressing-room-preview-detail">
             {locked ? <><Lock className="size-4" />{locked.name} {lockedPrice !== undefined && <Coin value={lockedPrice} />}</>

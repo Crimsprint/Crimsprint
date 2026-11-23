@@ -1,7 +1,7 @@
 'use client'
 import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
-import type { StoredOutfit } from './avatar'
+import type { AvatarSource, StoredOutfit } from './avatar'
 import { clearDraft } from './onboardingDraft'
 import { EXPIRED_MESSAGE, isAuthFailure, isDeadSession, mayRecover } from './session'
 
@@ -94,3 +94,5 @@ export type Profile = {
   coins: number; freezes: number; streak: number; longest_streak: number; total_points: number; league: string | null
   inventory: Record<string, number>; prices: Record<string, number>; achievements: { code: string; earned_at: string }[]
 }
+
+export type ProfileWithCrown = Profile & Pick<AvatarSource, 'crown_expires_at'> & { crowns_won: number }
