@@ -191,6 +191,86 @@ begin
   );
 end $$;
 
+create or replace function public.mock_advance(p_mock uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  m public.mocks;
+  acc float8;
+  route text;
+  sec text;
+  rw jsonb; mt jsonb;
+  r record;
+  mm public.mastery;
+  today date;
+begin
+  select * into m from public.mocks where id = p_mock for update;
+  if m.status <> 'active' then return; end if;
+  today := public.local_day(m.user_id);
+
+  update public.mock_items x set correct = case
+      when x.response is null then false
+      when i.kind = 'mcq' then x.response = i.answer->>'choice'
+      else public.spr_correct(x.response, i.answer->'values') end
+  from public.items i where i.id = x.item_id and x.mock_id = m.id and x.stage = m.stage;
+
+  update public.mocks set stage_seconds = stage_seconds
+    || least(public.mock_limit(m.stage), extract(epoch from now() - m.stage_started_at)::int)
+  where id = m.id;
+
+  if exists (
+    select 1 from public.mock_items
+    where mock_id = m.id and stage = m.stage and response is not null and not pretest and correct is not null
+  ) then
+    perform public.add_points(m.user_id, 3 + (select count(*)::int from public.mock_items where mock_id = m.id and stage = m.stage and response is not null));
+    perform public.apply_streak(m.user_id, now());
+    perform public.bump_quest(m.user_id, 'mock1', 1);
+  end if;
+
+  if m.stage in (0, 2) then
+    select avg(correct::int) into acc from public.mock_items where mock_id = m.id and stage = m.stage;
+    route := case when acc >= 0.6 then 'higher' else 'lower' end;  -- College Board's threshold is unpublished
+    sec := case when m.stage = 0 then 'rw' else 'math' end;
+    update public.mocks set stage = m.stage + 1, stage_started_at = now(), routes = routes || jsonb_build_object(sec, route) where id = m.id;
+    perform public.mock_assemble(m.id, m.stage + 1, route);
+  elsif m.stage = 1 then
+    update public.mocks set status = 'break', stage = 2 where id = m.id;  -- 10-minute break; Math starts on resume
+  else
+    -- Mastery and review from every item, then the score estimate.
+    for r in select mi.correct, i.id, i.skill_id, i.b from public.mock_items mi join public.items i on i.id = mi.item_id where mi.mock_id = m.id loop
+      insert into public.mastery (user_id, skill_id) values (m.user_id, r.skill_id) on conflict do nothing;
+      select * into mm from public.mastery where user_id = m.user_id and skill_id = r.skill_id;
+      update public.mastery set theta = mm.theta + greatest(0.2, 0.8 / sqrt(1 + mm.n)) * (r.correct::int - public.p_correct(mm.theta, r.b)), n = mm.n + 1
+      where user_id = m.user_id and skill_id = r.skill_id;
+      if not r.correct then
+        insert into public.review_items values (m.user_id, r.id, 1, today + 1)
+        on conflict (user_id, item_id) do update set box = 1, due = today + 1;
+      end if;
+    end loop;
+    rw := public.mock_section_score(m.id, array[0, 1]);
+    mt := public.mock_section_score(m.id, array[2, 3]);
+    select * into m from public.mocks where id = m.id;
+    update public.mocks set status = 'completed', completed_at = now(), result = jsonb_build_object(
+      'sections', jsonb_build_object(
+        'rw', rw || jsonb_build_object('seconds_per_q', (m.stage_seconds[1] + m.stage_seconds[2]) / greatest(1, (rw->>'total')::int)),
+        'math', mt || jsonb_build_object('seconds_per_q', (m.stage_seconds[3] + m.stage_seconds[4]) / greatest(1, (mt->>'total')::int))),
+      'total', jsonb_build_object(
+        'estimate', (rw->>'estimate')::int + (mt->>'estimate')::int,
+        'low', (rw->>'low')::int + (mt->>'low')::int,
+        'high', (rw->>'high')::int + (mt->>'high')::int),
+      'routes', m.routes,
+      'domains', (select jsonb_agg(jsonb_build_object('domain', d.domain_name, 'correct', d.c, 'total', d.n) order by d.sort)
+                  from (select s.domain_name, min(s.sort) sort, count(*) n, count(*) filter (where mi.correct) c
+                        from public.mock_items mi join public.items i on i.id = mi.item_id join public.skills s on s.id = i.skill_id
+                        where mi.mock_id = m.id group by s.domain_name) d),
+      'flagged_wrong', (select count(*) from public.mock_items where mock_id = m.id and flagged and not correct)
+    ) where id = m.id;
+    if (select count(distinct stage) from public.mock_items
+        where mock_id = m.id and response is not null and not pretest and correct is not null) = 4 then
+      perform public.award(m.user_id, 'full_run');
+    end if;
+  end if;
+end $$;
+
 create or replace function public.mock_advance_v2(p_mock uuid, p_stage int) returns void
 language plpgsql security definer set search_path = public as $$
 declare

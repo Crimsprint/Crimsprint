@@ -87,36 +87,47 @@ it.each(['sat', 'psat'])('keeps late and duplicate %s submits on the viewed stag
   expect(await state()).toMatchObject({ status: 'break', stage: 2 })
 })
 
-it('earns no points, streak, quest or full_run for an all-blank PSAT mock', async () => {
-  const { uid, id, state, submit } = await newMock()
+it.each(['sat', 'psat'])('earns no points, streak, quest or full_run for an all-blank %s mock', async (exam) => {
+  const { uid, id, state, submit } = await newMock(exam)
   await db.query("insert into public.daily_quests (user_id, day, code, target) values ($1, public.local_day($1), 'mock1', 1)", [uid])
   for (let stage = 0; stage < 4; stage++) {
     if (stage === 2) await call(uid, 'mock_resume_v2', id)
     expect(await state()).toMatchObject({ status: 'active', stage })
     await submit(stage)
   }
-  expect(await state()).toMatchObject({ status: 'completed', result: { selection_index: expect.any(Number) } })
+  const completed = await state()
+  expect(completed).toMatchObject({
+    status: 'completed',
+    result: {
+      sections: { rw: { correct: 0, total: exam === 'sat' ? 54 : 50 }, math: { correct: 0, total: exam === 'sat' ? 44 : 40 } },
+      routes: { rw: 'lower', math: 'lower' },
+    },
+  })
+  if (exam === 'psat') expect(completed.result.selection_index).toEqual(expect.any(Number))
+  else expect(completed.result).not.toHaveProperty('selection_index')
   expect(await points(uid)).toEqual({ points: 0 })
   expect(await one('select streak, last_active from public.profiles where id = $1', [uid])).toEqual({ streak: 0, last_active: null })
   expect(await one("select progress, done from public.daily_quests where user_id = $1 and code = 'mock1'", [uid])).toEqual({ progress: 0, done: false })
   expect(await one("select code from public.achievements where user_id = $1 and code = 'full_run'", [uid])).toBeUndefined()
 })
 
-it('requires scored work for each PSAT module and the full_run award, including through legacy RPCs', async () => {
-  const { uid, id, state, submit } = await newMock()
+it.each(['sat', 'psat'])('requires scored work in each %s module for full_run, including through legacy RPCs', async (exam) => {
+  const { uid, id, state, submit } = await newMock(exam)
   await db.query("insert into public.daily_quests (user_id, day, code, target) values ($1, public.local_day($1), 'mock1', 1)", [uid])
   for (let stage = 0; stage < 4; stage++) {
     if (stage === 2) await call(uid, 'mock_resume', id)
     const loaded = await call(uid, 'mock_state', id)
     expect(loaded).toMatchObject({ status: 'active', stage })
     expect(loaded).not.toHaveProperty('exam_target')
-    const { position, item_id } = await one<{ position: number; item_id: string }>(
-      'select position, item_id from public.mock_items where mock_id = $1 and stage = $2 and pretest = $3 limit 1',
-      [id, stage, stage === 0],
-    )
-    await call(uid, 'mock_answer', id, position, await keyFor(item_id, true))
+    if (stage !== 0 || exam === 'psat') {
+      const { position, item_id } = await one<{ position: number; item_id: string }>(
+        'select position, item_id from public.mock_items where mock_id = $1 and stage = $2 and pretest = $3 limit 1',
+        [id, stage, stage === 0],
+      )
+      await call(uid, 'mock_answer', id, position, await keyFor(item_id, true))
+    }
     if (stage === 0) {
-      // A timed-out PSAT module still uses PSAT eligibility when read by the legacy state RPC.
+      // The legacy state RPC closes the blank SAT or pretest-only PSAT module on timeout.
       await db.query("update public.mocks set stage_started_at = now() - interval '40 minutes' where id = $1", [id])
       expect(await call(uid, 'mock_state', id)).toMatchObject({ stage: 1 })
       expect(await points(uid)).toEqual({ points: 0 })
