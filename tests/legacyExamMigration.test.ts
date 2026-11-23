@@ -88,3 +88,50 @@ it('serves the 773ef6a client after the exam migration on its original database 
   expect(await legacyRpc('mock_state_v2', { p_mock: psatMock }, other)).toMatchObject({ exam_target: 'psat', stage: 0 })
   await expect(legacyRpc('mock_state_v2', { p_mock: psatMock })).rejects.toThrow(/mock not found/)
 }, 60_000)
+
+it('keeps both deployed client RPC flows working after 0011, including mocks already open on 0010', async () => {
+  await setupThrough(10)
+  const contracts = async () => (await db.query(`
+    select oid::regprocedure::text as name, pg_get_function_arguments(oid) as args,
+           pg_get_function_result(oid) as result, proacl::text as acl
+    from pg_proc where pronamespace = 'public'::regnamespace and prokind = 'f' order by name
+  `)).rows
+  const before = await contracts()
+  await newUser(uid, 'UTC')
+  await newUser(other, 'UTC')
+  const settings = { p_goal: 'first', p_test_date: null, p_current: 400, p_target: 1200, p_daily_goal: 20, p_timezone: 'UTC' }
+  await legacyRpc('save_onboarding', settings)
+  await legacyRpc('save_onboarding_v2', { ...settings, p_exam_target: 'psat' }, other)
+
+  const mocks: { id: string; suffix: string; user: string }[] = []
+  for (const [suffix, user] of [['', uid], ['_v2', uid], ['_v2', other]]) {
+    const id = await legacyRpc<string>(`start_mock${suffix}`, {}, user)
+    expect(await legacyRpc(`mock_state${suffix}`, { p_mock: id }, user)).toMatchObject({ status: 'active', stage: 0 })
+    mocks.push({ id, suffix, user })
+  }
+
+  await applyMigration('0011_security_fixes.sql')
+  expect(await contracts()).toEqual(before)
+  for (const { id, suffix, user } of mocks) {
+    const args = { p_mock: id }
+    // No post-migration state call before the first submit. The deployed client already has the state.
+    await legacyRpc(`mock_submit${suffix}`, args, user)
+    for (const stage of [1, 2, 3]) {
+      if (stage === 2) await legacyRpc(`mock_resume${suffix}`, args, user)
+      const state = await legacyRpc(`mock_state${suffix}`, args, user)
+      expect(state).toMatchObject({ status: 'active', stage })
+      const { position, item } = state.items[0]
+      await legacyRpc('mock_answer', { ...args, p_position: position, p_response: await keyFor(item.id, true) }, user)
+      await legacyRpc(`mock_submit${suffix}`, args, user)
+    }
+    const done = await legacyRpc(`mock_state${suffix}`, args, user)
+    expect(done).toMatchObject({ status: 'completed', stage: 3 })
+    expect(done.result.sections.rw.total).toBe(user === other ? 50 : 54)
+    expect(await legacyRpc('mock_review', args, user)).toHaveLength(98)
+  }
+
+  const lesson = await legacyRpc<string>('start_session', { p_mode: 'lesson', p_skill: 'math.alg.lin1', p_tier: 'easy' })
+  const { item } = await legacyRpc('next_item', { p_session: lesson })
+  expect(await legacyRpc('submit_answer', { p_session: lesson, p_response: await keyFor(item.id, true), p_ms: 250 }))
+    .toMatchObject({ correct: true, done: false })
+}, 60_000)
