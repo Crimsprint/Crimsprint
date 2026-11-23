@@ -19,7 +19,11 @@ let client: SupabaseClient | null = null
 /** Browser client. The session lives in cookies, so src/proxy.ts can see it and guard routes. */
 export function supabase(): SupabaseClient {
   if (!configured) throw new Error('Supabase is not configured. Copy .env.example to .env.local and fill it in.')
-  return (client ??= createBrowserClient(url!, key!))
+  if (!client) {
+    client = createBrowserClient(url!, key!)
+    client.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') clearDraft() })
+  }
+  return client
 }
 
 /** For signed-in pages. Never creates an account: the proxy already sends visitors without one to /login. */
@@ -33,8 +37,8 @@ export async function requireUser(): Promise<User> {
 }
 
 export async function signOut() {
+  clearDraft()
   await supabase().auth.signOut()
-  clearDraft() // unfinished onboarding answers belong to whoever signs in next, not to this account
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- drop everything held in memory
   location.assign('/')
 }
@@ -45,6 +49,7 @@ async function recover(): Promise<never> {
   let storage: Storage | null = null
   try { storage = sessionStorage } catch {}
   if (!mayRecover(storage)) throw new Error(EXPIRED_MESSAGE)
+  clearDraft()
   await supabase().auth.signOut({ scope: 'local' }) // this browser only
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a full load starts from a clean slate
   location.assign(`/login?expired=1&next=${encodeURIComponent(location.pathname + location.search)}`)
@@ -58,8 +63,10 @@ async function sessionIsDead() {
   return isDeadSession(error)
 }
 
-export async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
-  const { data, error, status } = await supabase().rpc(fn, args)
+export async function rpc<T>(fn: string, args?: Record<string, unknown>, headers?: Record<string, string>): Promise<T> {
+  const request = supabase().rpc(fn, args)
+  for (const [name, value] of Object.entries(headers ?? {})) request.setHeader(name, value)
+  const { data, error, status } = await request
   if (error) {
     if (isAuthFailure(error, status) || await sessionIsDead()) await recover()
     throw new Error(error.message)

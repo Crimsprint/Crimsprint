@@ -114,6 +114,7 @@ it('runs all four PSAT modules, excludes pretest responses from routes and score
 
   const done = await call('mock_state_v2', [mock])
   const { rw, math } = done.result.sections
+  expect(await one("select code from public.achievements where user_id = $1 and code = 'full_run'", [u])).toEqual({ code: 'full_run' })
   expect(done.result.routes).toEqual({ rw: 'higher', math: 'lower' })
   expect(rw).toMatchObject({ total: 50, correct: 30 })
   expect(math).toMatchObject({ total: 40, correct: 18 })

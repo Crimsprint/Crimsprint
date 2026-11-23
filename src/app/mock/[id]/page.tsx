@@ -71,7 +71,8 @@ function Module({ id, st, onSubmitted }: { id: string; st: State; onSubmitted: (
       const s = slots.find((x) => x.position === Number(pos))
       return rpc('mock_answer', { p_mock: id, p_position: Number(pos), p_response: s?.response ?? '' }).catch(() => {})
     }))
-    await rpc('mock_submit_v2', { p_mock: id }).catch(() => {})  // the server also closes expired modules itself
+    // Bind manual and timer submissions to the stage this component actually displayed.
+    await rpc('mock_submit_v2', { p_mock: id }, { Prefer: `crimsprint-mock-stage=${st.stage}` }).catch(() => {})
     onSubmitted()
   }
   useEffect(() => { if (left <= 0) submit() })  // time's up: auto-submit, like Bluebook

@@ -12,11 +12,16 @@ const DRAFT = 'onboarding', EMAIL = 'verify-email'
 const get = (s: () => Storage, k: string) => { try { return s().getItem(k) } catch { return null } }
 const set = (s: () => Storage, k: string, v: string | null) => { try { if (v === null) s().removeItem(k); else s().setItem(k, v) } catch {} }
 
-export const saveDraft = (d: Draft) => set(() => localStorage, DRAFT, JSON.stringify(d))
+const DRAFT_MAX_AGE = 24 * 60 * 60 * 1000
+
+export const saveDraft = (draft: Draft) => set(() => localStorage, DRAFT, JSON.stringify({ draft, savedAt: Date.now() }))
 export const readDraft = (): Draft | null => {
   try {
-    const draft = JSON.parse(get(() => localStorage, DRAFT) ?? 'null')
-    return draft && { p_exam_target: 'sat', ...draft }
+    const stored = JSON.parse(get(() => localStorage, DRAFT) ?? 'null')
+    const age = Date.now() - stored?.savedAt
+    if (!Number.isFinite(stored?.savedAt) || age < 0 || age >= DRAFT_MAX_AGE ||
+        !stored.draft || typeof stored.draft !== 'object' || Array.isArray(stored.draft)) return null
+    return stored.draft
   } catch { return null }
 }
 export const clearDraft = () => set(() => localStorage, DRAFT, null)

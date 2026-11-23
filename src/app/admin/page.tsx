@@ -35,16 +35,20 @@ export default function Admin() {
   const [edit, setEdit] = useState<Item | null>(null)
   const [valuesText, setValuesText] = useState('')
   const [error, setError] = useState('')
-  const [denied, setDenied] = useState('')
-  const [uid, setUid] = useState('')
+  const [allowed, setAllowed] = useState<boolean | null>(null)
   const [version, setVersion] = useState(0)
 
   useEffect(() => {
-    requireUser().then((u) => {
-      setUid(u.id)
-      return Promise.all([rpc<Report[]>('admin_reports'), supabase().from('skills').select('id, name').order('sort')])
-    }).then(([r, s]) => { setReports(r); setSkills(s.data ?? []) })
-      .catch((e) => (String(e.message).includes('admin only') ? setDenied(e.message) : setError(e.message)))
+    let current = true
+    requireUser().then(() => Promise.all([
+      rpc<Report[]>('admin_reports'), supabase().from('skills').select('id, name').order('sort'),
+    ])).then(([r, s]) => {
+      if (!current) return
+      setReports(r)
+      setSkills(s.data ?? [])
+      setAllowed(true)
+    }).catch(() => { if (current) setAllowed(false) })
+    return () => { current = false }
   }, [version])
 
   useEffect(() => {
@@ -68,13 +72,8 @@ export default function Admin() {
     } catch (e) { setError((e as Error).message) }
   }
 
-  if (denied) return (
-    <Screen className="space-y-3">
-      <h1 className="text-2xl font-bold">Admins only</h1>
-      <p>To make this account an admin, run in the Supabase SQL editor:</p>
-      <pre className="whitespace-pre-wrap break-all rounded-lg bg-surface p-3 text-sm">{`update public.profiles set is_admin = true where id = '${uid}';`}</pre>
-    </Screen>
-  )
+  if (allowed === null) return <Screen><p aria-live="polite">Loading…</p></Screen>
+  if (!allowed) return <Screen><h1 className="text-2xl font-bold">Not found</h1></Screen>
 
   const set = (patch: Partial<Item>) => setEdit((e) => e && { ...e, ...patch })
   const key = edit?.answer.choice
